@@ -5,7 +5,7 @@ SET(CROSS_COMPILE 1)
 IF(CROSS_COMPILE)
 SET(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR loongson)
-SET(TOOLCHAIN_DIR "/opt/ls_2k0300_env/loongson-gnu-toolchain-8.3-x86_64-loongarch64-linux-gnu-rc1.6")
+SET(TOOLCHAIN_DIR "/opt/loongarch64-gnu-gcc-ABI1")
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN_DIR}/bin/loongarch64-linux-gnu-g++)
 set(CMAKE_C_COMPILER ${TOOLCHAIN_DIR}/bin/loongarch64-linux-gnu-gcc)
 
