@@ -279,7 +279,6 @@ connect:
     Ki = 0.7;
     Kd = 0.05;
 
-
     client.sendpack(&Kp, 8);
     client.sendpack(&Ki, 8);
     client.sendpack(&Kd, 8);
