@@ -200,9 +200,6 @@ void lineprocess(vector<int> &path,vector<int> &dpath, double& axis){
 
 
     pathcore = ((1. * pathsum) / rightsum / 100) * 1.*k1/1000.;
-    // if(pathcore<0){
-    //     pathcore = pathcore/2.;
-    // }
     dpathcore = ((1. * dpathsum) / drightsum) * 1.*k2/1000.;
     axis = (pathcore  + dpathcore);//0.2
 }
