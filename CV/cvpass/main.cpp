@@ -157,6 +157,7 @@ int main(int argc,char* argv[]){
 int rightsum,drightsum;
 vector<int> rightseq,drightseq;
 int firstrun=0;
+
 void lineprocess(vector<int> &path,vector<int> &dpath, double& axis){
     int pathsum = 0;
     if(firstrun==0){
