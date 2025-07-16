@@ -1,0 +1,52 @@
+<!--
+  该行为树（Behavior Tree）以1Hz的频率周期性地重新规划全局路径，
+  并针对规划/控制及系统问题设置了恢复动作（recovery actions）。
+  如果选择了运动学有效的规划器，这个过程会持续进行。
+-->
+<root main_tree_to_execute="MainTree"> <!-- 定义行为树的根节点，指定主执行树为MainTree -->
+  <BehaviorTree ID="MainTree"> <!-- 定义一个ID为MainTree的行为树 -->
+    <!-- RecoveryNode：恢复节点，最多重试6次，名称为NavigateRecovery -->
+    <RecoveryNode number_of_retries="6" name="NavigateRecovery">
+      <!-- PipelineSequence：流水线顺序节点，名称为NavigateWithReplanning -->
+      <PipelineSequence name="NavigateWithReplanning">
+        <!-- RateController：频率控制器，限制内部节点以1Hz运行一次 -->
+        <RateController hz="1.0">
+          <!-- RecoveryNode：恢复节点，最多重试1次，名称为ComputePathToPose -->
+          <RecoveryNode number_of_retries="1" name="ComputePathToPose">
+            <!-- ComputePathToPose：根据目标点goal计算路径，输出为path，使用GridBased规划器 -->
+            <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+            <!-- ClearEntireCostmap：清除全局代价地图（上下文恢复动作），服务名为global_costmap/clear_entirely_global_costmap -->
+            <ClearEntireCostmap name="ClearGlobalCostmap-Context" service_name="global_costmap/clear_entirely_global_costmap"/>
+          </RecoveryNode>
+        </RateController>
+        <!-- RecoveryNode：恢复节点，最多重试1次，名称为FollowPath -->
+        <RecoveryNode number_of_retries="1" name="FollowPath">
+          <!-- FollowPath：跟随路径，输入为path，使用FollowPath控制器 -->
+          <FollowPath path="{path}" controller_id="FollowPath"/>
+          <!-- ClearEntireCostmap：清除局部代价地图（上下文恢复动作），服务名为local_costmap/clear_entirely_local_costmap -->
+          <ClearEntireCostmap name="ClearLocalCostmap-Context" service_name="local_costmap/clear_entirely_local_costmap"/>
+        </RecoveryNode>
+      </PipelineSequence>
+      <!-- ReactiveFallback：反应式备用节点，名称为RecoveryFallback -->
+      <ReactiveFallback name="RecoveryFallback">
+        <!-- GoalUpdated：检测目标点是否更新，若更新则优先处理 -->
+        <GoalUpdated/>
+        <!-- RoundRobin：轮询节点，名称为RecoveryActions，依次尝试所有恢复动作 -->
+        <RoundRobin name="RecoveryActions">
+          <!-- Sequence：顺序节点，名称为ClearingActions，依次执行清除动作 -->
+          <Sequence name="ClearingActions">
+            <!-- 清除局部代价地图（子树恢复动作） -->
+            <ClearEntireCostmap name="ClearLocalCostmap-Subtree" service_name="local_costmap/clear_entirely_local_costmap"/>
+            <!-- 清除全局代价地图（子树恢复动作） -->
+            <ClearEntireCostmap name="ClearGlobalCostmap-Subtree" service_name="global_costmap/clear_entirely_global_costmap"/>
+          </Sequence>
+          <!-- <Spin spin_dist="1.57"/> --> <!-- 旋转动作（已注释，可选） -->
+          <!-- Wait：等待5秒 -->
+          <Wait wait_duration="5"/>
+          <!-- BackUp：后退0.3米，速度0.05米/秒 -->
+          <BackUp backup_dist="0.30" backup_speed="0.05"/>
+        </RoundRobin>
+      </ReactiveFallback>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>

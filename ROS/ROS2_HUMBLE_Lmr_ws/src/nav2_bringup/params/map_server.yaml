@@ -1,0 +1,12 @@
+map_server:  # map_server节点的参数配置
+  ros__parameters:  # ROS2参数命名空间
+    use_sim_time: False  # 是否使用仿真时间（通常用于仿真环境，True为仿真时间，False为系统时间）
+    yaml_filename: "/home/lcyx/ROS2_HUMBLE_Lmr/ROS2_HUMBLE_Lmr_ws/src/e07_nav2_bringup/maps/ros_map.yaml"  # 地图文件的yaml路径，留空表示未指定地图文件
+
+map_saver:  # map_saver节点的参数配置
+  ros__parameters:  # ROS2参数命名空间
+    use_sim_time: False  # 是否使用仿真时间（通常用于仿真环境，True为仿真时间，False为系统时间）
+    save_map_timeout: 5.0  # 保存地图操作的超时时间（单位：秒）
+    free_thresh_default: 0.25  # 空闲区域的阈值（概率小于该值的像素被认为是空闲区域）
+    occupied_thresh_default: 0.65  # 占用区域的阈值（概率大于该值的像素被认为是障碍物）
+    map_subscribe_transient_local: True  # 是否以transient local模式订阅地图话题（保证新订阅者能收到历史消息）

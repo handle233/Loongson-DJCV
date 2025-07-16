@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<robot name="mini_car">
+    <!-- 定义颜色 -->
+    <material name="blue">
+        <color rgba="0 0 1 0.5"/>
+    </material>
+    <material name="gray">
+        <color rgba="0.5 0.5 0.5 0.5"/>
+    </material>
+    <material name="green">
+        <color rgba="0 1 0 0.5"/>
+    </material>
+  
+ 
+    
+  <!-- base_link - 机器人主体 -->
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0.01" rpy="0 0 0"/> <!-- 盒子中心位于0.05高度 -->
+      <geometry>
+        <box size="0.24 0.14 0.1"/> <!-- 高度为0.1，中心在0.05 -->
+      </geometry>
+      <material name="blue"/>
+    </visual>
+  </link>
+    
+
+  <!-- laser link -->
+  <link name="laser_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.03" radius="0.03"/>
+      </geometry>
+      <material name="green"/>
+    </visual>
+  </link>
+    
+  <!-- laser joint -->
+  <joint name="laser_joint" type="fixed">
+      <parent link="base_link" /> <!-- 父链接改为base_link -->
+      <child link="laser_link" />
+      <origin xyz="0.12 0 0.065" /> <!-- 位置相对于base_link -->
+  </joint>
+
+  <link name="imu_link">
+    <visual>
+      <origin xyz="0 0 0.0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.03 0.01"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <!-- imu joint -->
+  <joint name="imu_joint" type="fixed">
+      <parent link="base_link" /> <!-- 父链接改为base_link -->
+      <child link="imu_link" />
+      <origin xyz="0.02 0 0.01" /> <!-- 位置相对于base_link -->
+  </joint>
+</robot>

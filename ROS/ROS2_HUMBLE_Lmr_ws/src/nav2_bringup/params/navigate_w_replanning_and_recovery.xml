@@ -1,0 +1,32 @@
+<!--
+  This Behavior Tree replans the global path periodically at 1 Hz and it also has
+  recovery actions.
+-->
+<root main_tree_to_execute="MainTree"> <!-- 指定主行为树为MainTree -->
+  <BehaviorTree ID="MainTree"> <!-- 定义ID为MainTree的行为树 -->
+    <RecoveryNode number_of_retries="6" name="NavigateRecovery"> <!-- 恢复节点，最多重试6次，名称为NavigateRecovery -->
+      <PipelineSequence name="NavigateWithReplanning"> <!-- 管道序列节点，名称为NavigateWithReplanning -->
+        <RateController hz="0.0"> <!-- 速率控制器，控制子树执行频率，0.0表示只执行一次 -->
+          <RecoveryNode number_of_retries="1" name="ComputePathToPose"> <!-- 恢复节点，最多重试1次，名称为ComputePathToPose -->
+            <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/> <!-- 计算从当前位置到目标点的路径，使用GridBased规划器 -->
+            <ClearEntireCostmap name="ClearGlobalCostmap-Context" service_name="global_costmap/clear_entirely_global_costmap"/> <!-- 清除全局代价地图，服务名为global_costmap/clear_entirely_global_costmap -->
+          </RecoveryNode>
+        </RateController>
+        <RecoveryNode number_of_retries="1" name="FollowPath"> <!-- 恢复节点，最多重试1次，名称为FollowPath -->
+          <FollowPath path="{path}" controller_id="FollowPath"/> <!-- 跟随路径，使用FollowPath控制器 -->
+          <ClearEntireCostmap name="ClearLocalCostmap-Context" service_name="local_costmap/clear_entirely_local_costmap"/> <!-- 清除局部代价地图，服务名为local_costmap/clear_entirely_local_costmap -->
+        </RecoveryNode>
+      </PipelineSequence>
+      <ReactiveFallback name="RecoveryFallback"> <!-- 反应式回退节点，名称为RecoveryFallback -->
+        <GoalUpdated/> <!-- 检查目标是否已更新 -->
+        <SequenceStar name="RecoveryActions"> <!-- 顺序星节点，名称为RecoveryActions -->
+          <ClearEntireCostmap name="ClearLocalCostmap-Subtree" service_name="local_costmap/clear_entirely_local_costmap"/> <!-- 清除局部代价地图，服务名为local_costmap/clear_entirely_local_costmap -->
+          <ClearEntireCostmap name="ClearGlobalCostmap-Subtree" service_name="global_costmap/clear_entirely_global_costmap"/> <!-- 清除全局代价地图，服务名为global_costmap/clear_entirely_global_costmap -->
+          <Spin spin_dist="1.57"/> <!-- 原地旋转1.57弧度（约90度） -->
+          <Wait wait_duration="5"/> <!-- 等待5秒 -->
+        </SequenceStar>
+      </ReactiveFallback>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>
+</root>
