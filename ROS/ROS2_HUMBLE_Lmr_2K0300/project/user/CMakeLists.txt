@@ -23,15 +23,15 @@ message("Parent parent folder name: ${PARENT_PARENT_FOLDER_NAME}")
 project(${PARENT_PARENT_FOLDER_NAME} VERSION 0.1.0 LANGUAGES C CXX)
 
 # 设置OpenCV的安装路径
-set(CMAKE_PREFIX_PATH "/opt/ls_2k0300_env/opencv_4_10_build") 
+#set(CMAKE_PREFIX_PATH "/opt/ls_2k0300_env/opencv_4_10_build") 
 
 # 查找OpenCV库，确保安装了所需的依赖
-find_package(OpenCV REQUIRED)
+#find_package(OpenCV REQUIRED)
 
 # 包含OpenCV的头文件路径
-include_directories(${OpenCV_INCLUDE_DIRS})
-message(STATUS "OpenCV_INCLUDE_DIRS: ${OpenCV_INCLUDE_DIRS}")
-message(STATUS "OpenCV_LIBS: ${OpenCV_LIBS}")
+#include_directories(${OpenCV_INCLUDE_DIRS})
+#message(STATUS "OpenCV_INCLUDE_DIRS: ${OpenCV_INCLUDE_DIRS}")
+#message(STATUS "OpenCV_LIBS: ${OpenCV_LIBS}")
 
 # 包含项目的自定义库路径
 include_directories(../user)
