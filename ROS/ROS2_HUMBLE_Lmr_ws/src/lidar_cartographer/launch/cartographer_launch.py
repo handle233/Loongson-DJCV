@@ -18,9 +18,9 @@ def generate_launch_description():
         arguments = [
             '-configuration_directory', os.path.join(get_package_share_directory("lidar_cartographer"),"config"),
             '-configuration_basename', 'mycar.lua'],
-        remappings = [
-            ('scan', '/scan'),
-            ('odom', '/odom/encoder')],
+        # remappings = [
+        #     ('scan', '/scan'),
+        #     ('odom', '/odom')],
         output = 'screen'
     )
 

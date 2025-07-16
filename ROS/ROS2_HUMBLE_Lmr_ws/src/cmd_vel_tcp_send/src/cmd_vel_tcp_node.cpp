@@ -162,7 +162,7 @@ private:
         if (msg->linear.x == 0.0 && msg->angular.z == 0.0) {
             car_control.servo_angle = 90;
             car_control.speed = 0;
-            car_control.forward = 1;
+            // car_control.forward = 1;
         } else if (msg->linear.x != 0.0 && msg->angular.z == 0.0) {
             car_control.servo_angle = 90;
             car_control.speed = temp_speed;
@@ -180,7 +180,7 @@ private:
             if (temp_servo_angle < 0) temp_servo_angle = 0;
             car_control.servo_angle = temp_servo_angle;
             car_control.speed = 0;
-            car_control.forward = 0;
+            //car_control.forward = 0;
         }
 
         // ==================== 调试信息输出 ====================

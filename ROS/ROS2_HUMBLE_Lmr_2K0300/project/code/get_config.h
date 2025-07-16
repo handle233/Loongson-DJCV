@@ -7,7 +7,7 @@
 #include "tcp_recv_control.h"
 
 // IP地址 和 端口号
-#define SERVER_IP "192.168.3.24" // 服务器IP地址
+#define SERVER_IP "192.168.3.19" // 服务器IP地址
 
 // #define SEND_LADAR_PORT     ( 8888 )
 #define SEND_LADAR_PORT     ( 9999 )
