@@ -74,6 +74,6 @@ void tcp_send_encoder::send_data_thread()
             //printf("Encoder data sent: %.2f\n", interg);
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 每 100ms 发送一次
+        std::this_thread::sleep_for(std::chrono::milliseconds(10)); // 每 10ms 发送一次
     }
 }
