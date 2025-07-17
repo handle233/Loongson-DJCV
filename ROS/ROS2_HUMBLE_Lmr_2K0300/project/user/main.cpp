@@ -31,28 +31,7 @@ tcp_send_encoder encoder; // 创建编码器对象
 void timer_callback(void) 
 {
     //LCYX
-    if (g_car_control.servo_duty < 0 )
-    {
-        g_car_control.servo_duty = 0; // 限制舵机角度最小值为0
-    }
-    else if (g_car_control.servo_duty > 180)
-    {
-        g_car_control.servo_duty = 180; // 限制舵机角
-        // 最大值为180
-    }
-    Servo.setAngle(g_car_control.servo_duty);  // 设置舵机角度
-    //LCYX
-    if (g_car_control.left_speed > 0 && g_car_control.right_speed > 0) {
-        Motor.setLeftWheel(g_car_control.left_speed, true);
-        Motor.setRightWheel(g_car_control.right_speed, true); // 设置电机前进，速度为g_car_control.left_speed
-    } else if (g_car_control.left_speed < 0 && g_car_control.right_speed < 0) {
-        Motor.setLeftWheel(-g_car_control.left_speed, false);
-        Motor.setRightWheel(-g_car_control.right_speed, false); // 设置电机后
-    } else if (g_car_control.left_speed == 0 ) {
-        Motor.stop(); // 停止电机
-    } else {
-        printf("错误的速度值，无法设置电机速度！\n");
-    }
+    
     // Servo.setAngle(g_car_control.servo_angle);  // 设置舵机角度
     // if (g_car_control.forward) {
     //     Motor.move(g_car_control.speed, true); // 前进

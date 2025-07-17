@@ -35,6 +35,7 @@ FILE* log = nullptr; // 日志文件指针
             "/cmd_vel", 10,
             std::bind(&CmdVelTCPServer::cmd_vel_callback, this, std::placeholders::_1));
         init_tcp_connection();
+
         log = fopen("/tmp/cmd_vel_tcp_server.log", "at+");
         fprintf(log, "linear,angular,");
         fprintf(log, "akm_angle,rad,");
@@ -124,64 +125,13 @@ private:
         float akm_angle_deg_n =3.5 * akm_angle_deg;
 
         // ==================== 左右轮速度计算 ====================
-        float temp_left_speed = msg->linear.x;
-        float temp_right_speed = msg->linear.x;
-
-        // if (akm_angle != 0.0f) {
-        //     temp_left_speed  = msg->linear.x * (radius - 0.5f * AKM_WHEEL_BASE) / radius;
-        //     temp_right_speed = msg->linear.x * (radius + 0.5f * AKM_WHEEL_BASE) / radius;
-        // }
-
-        //car_control.left_speed = func_limit(temp_left_speed * 100, 100);
-        //car_control.right_speed = func_limit(temp_right_speed * 100, 100);
+        float temp_left_speed = msg->linear.x*38;
+        float temp_right_speed = msg->linear.x*38;
         
-        if(msg->linear.x > 0)
-        {
-          car_control.left_speed = 38 * temp_left_speed + 7;
-          car_control.right_speed = 38 * temp_right_speed + 7;
-        }
-        else if(msg->linear.x < 0)
-        {
-          car_control.left_speed = 38 * temp_left_speed - 7;
-          car_control.right_speed = 38 * temp_right_speed - 7;
-        }
-        else
-        {
-          car_control.left_speed = 0;
-          car_control.right_speed = 0;
-        }
         car_control.left_speed = func_limit(car_control.left_speed , 100);
         car_control.right_speed = func_limit(car_control.right_speed , 100);
         // ==================== 舵机占空比映射 ====================
         car_control.servo_duty = 90 + akm_angle_deg_n;
-
-        // ==================== LCYX的扩展：servo_angle、speed、forward ====================
-        float temp_speed = fabs(msg->linear.x) * 60;
-        if (temp_speed > 30) temp_speed = 30;
-
-        if (msg->linear.x == 0.0 && msg->angular.z == 0.0) {
-            car_control.servo_angle = 90;
-            car_control.speed = 0;
-            // car_control.forward = 1;
-        } else if (msg->linear.x != 0.0 && msg->angular.z == 0.0) {
-            car_control.servo_angle = 90;
-            car_control.speed = temp_speed;
-            car_control.forward = msg->linear.x > 0;
-        } else if (msg->linear.x != 0.0 && msg->angular.z != 0.0) {
-            float temp_servo_angle = 90 + (msg->angular.z > 0 ? fabs(msg->angular.z) : -fabs(msg->angular.z)) * 45;
-            if (temp_servo_angle > 180) temp_servo_angle = 180;
-            if (temp_servo_angle < 0) temp_servo_angle = 0;
-            car_control.servo_angle = temp_servo_angle;
-            car_control.speed = temp_speed;
-            car_control.forward = msg->linear.x > 0;
-        } else {
-            float temp_servo_angle = 90 + (msg->angular.z > 0 ? fabs(msg->angular.z) : -fabs(msg->angular.z));
-            if (temp_servo_angle > 180) temp_servo_angle = 180;
-            if (temp_servo_angle < 0) temp_servo_angle = 0;
-            car_control.servo_angle = temp_servo_angle;
-            car_control.speed = 0;
-            //car_control.forward = 0;
-        }
 
         // ==================== 调试信息输出 ====================
         RCLCPP_INFO(this->get_logger(), "linear: x=%f, angular: z=%f", msg->linear.x, msg->angular.z);
