@@ -124,19 +124,22 @@ private:
         float akm_angle_deg = akm_angle * 180.0f / PI;
         float akm_angle_deg_n =3.5 * akm_angle_deg;
 
-        // ==================== 左右轮速度计算 ====================
+        //左右轮速度计算
         if(msg->linear.x > 0){
-            car_control.forward = msg->linear.x>0?1:0;
+            car_control.forward = msg->linear.x>0?1:-1;
+        }else{
+            car_control.forward = 0;
         }
         car_control.left_speed = msg->linear.x*38;
         car_control.right_speed = msg->linear.x*38;
         
         car_control.left_speed = func_limit(car_control.left_speed , 20);
         car_control.right_speed = func_limit(car_control.right_speed , 20);
-        // ==================== 舵机占空比映射 ====================
+
+        //舵机占空比映射
         car_control.servo_duty = 90 + akm_angle_deg_n;
 
-        // ==================== 调试信息输出 ====================
+        //调试信息输出
         RCLCPP_INFO(this->get_logger(), "linear: x=%f, angular: z=%f", msg->linear.x, msg->angular.z);
         RCLCPP_INFO(this->get_logger(), "akm_angle: %f rad, %f deg", akm_angle, akm_angle_deg);
         RCLCPP_INFO(this->get_logger(), "servo_duty: %d, left_speed: %d, right_speed: %d",
@@ -147,7 +150,8 @@ private:
         fprintf(log, "%d,%d,%d\n",
                 car_control.servo_duty, car_control.left_speed, car_control.right_speed);
         fflush(log);
-        // ==================== 发送控制数据 ====================
+
+        //发送控制数据
         uint8_t *buff = (uint8_t *)&car_control;
         ssize_t send_len = send(new_socket_, buff, sizeof(car_control_typedef), 0);
 
