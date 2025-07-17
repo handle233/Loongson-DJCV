@@ -74,6 +74,7 @@ void tcp_recv_control_thd_entry(void)
             g_car_control.left_speed = tcp_car_control.left_speed; // LCYX: 调整速度比例
             g_car_control.right_speed = tcp_car_control.right_speed; // LCYX: 调整速度比例
             g_car_control.servo_duty = tcp_car_control.servo_duty;
+            g_car_control.forward = tcp_car_control.forward;
             
 
             //设置电机
@@ -87,14 +88,15 @@ void tcp_recv_control_thd_entry(void)
             if(g_car_control.left_speed>=0){
                 Motor.setLeftWheel(g_car_control.left_speed,1);
             }else{
-                Motor.setLeftWheel(g_car_control.left_speed,0);
+                Motor.setLeftWheel(-g_car_control.left_speed,0);
             }
-            if(g_car_control.right_speed<0){
+            if(g_car_control.right_speed>=0){
                 Motor.setRightWheel(g_car_control.right_speed,1);
             }else{
-                Motor.setRightWheel(g_car_control.right_speed,0);
+                Motor.setRightWheel(-g_car_control.right_speed,0);
             }
-
+            
+            cout<<"left "<<g_car_control.left_speed<<"right "<<g_car_control.right_speed<<endl;
         }
     }
 }

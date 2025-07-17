@@ -125,11 +125,14 @@ private:
         float akm_angle_deg_n =3.5 * akm_angle_deg;
 
         // ==================== 左右轮速度计算 ====================
-        float temp_left_speed = msg->linear.x*38;
-        float temp_right_speed = msg->linear.x*38;
+        if(msg->linear.x > 0){
+            car_control.forward = msg->linear.x>0?1:0;
+        }
+        car_control.left_speed = msg->linear.x*38;
+        car_control.right_speed = msg->linear.x*38;
         
-        car_control.left_speed = func_limit(car_control.left_speed , 100);
-        car_control.right_speed = func_limit(car_control.right_speed , 100);
+        car_control.left_speed = func_limit(car_control.left_speed , 20);
+        car_control.right_speed = func_limit(car_control.right_speed , 20);
         // ==================== 舵机占空比映射 ====================
         car_control.servo_duty = 90 + akm_angle_deg_n;
 
