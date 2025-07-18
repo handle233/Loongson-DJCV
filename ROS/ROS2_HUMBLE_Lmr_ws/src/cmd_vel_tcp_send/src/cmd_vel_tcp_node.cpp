@@ -4,8 +4,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstring>
-// #include <stdio.h>
-// #include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 // ==================== 宏定义区 ====================
 #define PORT 8890                     // TCP端口号
