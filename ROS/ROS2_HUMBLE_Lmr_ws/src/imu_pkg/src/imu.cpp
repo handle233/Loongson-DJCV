@@ -228,18 +228,22 @@ private:
 
         double gama = data.encoder_data;
 
-        if(abs(theta)<=1e-3){
-          double r = abs(gama/theta);
-  #define square(x) ((x)*(x))
-  
           double derta = 0.;
+        if(abs(theta)>=1e-2){
+          double r = abs(gama/theta);
+          if(r<0.1*1e-3){
+            return;
+          }
+  #define square(x) ((x)*(x))
+          double Rs = 0.;
           if(theta>0){//turn left
-            double Rs = sqrt(square(r)-square(h)+d);
+            Rs = sqrt(square(r)-square(h*1e-2))+d*1e-2;
             derta = gama*Rs/r;
           }else if(theta<0){//turn right
-            double Rs = sqrt(square(r)-square(h)-d);
+            Rs = sqrt(square(r)-square(h*1e-2))-d*1e-2;
             derta = gama*Rs/r;
           }
+          std::cout<<"r"<<r<<"theta "<<theta<<"Rs"<<Rs<<std::endl;
   
         }else{
           derta = gama;
