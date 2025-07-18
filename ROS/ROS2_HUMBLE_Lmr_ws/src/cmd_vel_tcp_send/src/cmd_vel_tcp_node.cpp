@@ -125,10 +125,10 @@ private:
         float akm_angle_deg_n =3.5 * akm_angle_deg;
 
         //左右轮速度计算
-        if(msg->linear.x > 0){
-            car_control.forward = msg->linear.x>0?1:-1;
+        if(abs(msg->linear.x) > 0.0001){//判断速度存在
+            car_control.forward = msg->linear.x>0?1:-1;//存在的话判定正负
         }else{
-            car_control.forward = 0;
+            car_control.forward = 0;//自由运动则输出0
         }
         car_control.left_speed = msg->linear.x*38;
         car_control.right_speed = msg->linear.x*38;

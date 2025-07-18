@@ -74,6 +74,7 @@ void tcp_recv_control_thd_entry(void)
             g_car_control.left_speed = tcp_car_control.left_speed; // LCYX: 调整速度比例
             g_car_control.right_speed = tcp_car_control.right_speed; // LCYX: 调整速度比例
             g_car_control.servo_duty = tcp_car_control.servo_duty;
+            //判断指定速度是否为0，为0就不更新
             if(tcp_car_control.forward!=0){
                 g_car_control.forward = tcp_car_control.forward;
             }
