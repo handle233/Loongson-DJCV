@@ -228,21 +228,18 @@ private:
 
         double gama = data.encoder_data;
 
-        if(theta!=0){
+        if(abs(theta)<=1e-3){
           double r = abs(gama/theta);
   #define square(x) ((x)*(x))
   
           double derta = 0.;
-          if(theta>0.001){//turn left
+          if(theta>0){//turn left
             double Rs = sqrt(square(r)-square(h)+d);
             derta = gama*Rs/r;
-          }else if(theta<-0.001){//turn right
+          }else if(theta<0){//turn right
             double Rs = sqrt(square(r)-square(h)-d);
             derta = gama*Rs/r;
-          }else{
-            derta = gama;
           }
-          derta = derta;
   
           x_ += derta * cos(theta_integral);
           y_ += derta * sin(theta_integral);
