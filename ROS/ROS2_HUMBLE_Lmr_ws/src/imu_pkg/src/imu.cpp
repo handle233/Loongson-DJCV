@@ -244,11 +244,11 @@ private:
           }
           derta = derta;
   
-          x_ += derta * cos(theta_integral);
-          y_ += derta * sin(theta_integral);
         }else{
           derta = gama;
         }
+          x_ += derta * cos(theta_integral);
+          y_ += derta * sin(theta_integral);
         
 
         auto now = this->get_clock()->now();
