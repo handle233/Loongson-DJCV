@@ -228,23 +228,27 @@ private:
 
         double gama = data.encoder_data;
 
-        double r = abs(gama/theta);
-#define square(x) ((x)*(x))
-
-        double derta = 0.;
-        if(theta>0.001){//turn left
-          double Rs = sqrt(square(r)-square(h)+d);
-          derta = gama*Rs/r;
-        }else if(theta<-0.001){//turn right
-          double Rs = sqrt(square(r)-square(h)-d);
-          derta = gama*Rs/r;
+        if(theta!=0){
+          double r = abs(gama/theta);
+  #define square(x) ((x)*(x))
+  
+          double derta = 0.;
+          if(theta>0.001){//turn left
+            double Rs = sqrt(square(r)-square(h)+d);
+            derta = gama*Rs/r;
+          }else if(theta<-0.001){//turn right
+            double Rs = sqrt(square(r)-square(h)-d);
+            derta = gama*Rs/r;
+          }else{
+            derta = gama;
+          }
+          derta = derta;
+  
+          x_ += derta * cos(theta_integral);
+          y_ += derta * sin(theta_integral);
         }else{
           derta = gama;
         }
-        derta = derta;
-
-        x_ += derta * cos(theta_integral);
-        y_ += derta * sin(theta_integral);
         
 
         auto now = this->get_clock()->now();
