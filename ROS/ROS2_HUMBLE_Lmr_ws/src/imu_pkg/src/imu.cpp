@@ -222,41 +222,30 @@ private:
         double dt = (current_time - last_time_).seconds();
         //std::cout<<"dt:"<<dt<<std::endl;
         last_time_ = current_time;
-        double theta_10ms=wz*dt; 
+        double theta=wz*dt; 
 
-            static double total_dist = 0;
-            total_dist += data.encoder_data;
-            //printf("%f\n",total_dist);
+        theta_integral += theta;
 
-        if(theta_10ms > 0)
-        {
-            // delta_x = delta_s_ * (sin (theta_10ms) / theta_10ms);
-            // delta_y = delta_s_ * ( (1 - cos (theta_10ms) ) / theta_10ms);
-            theta_integral += theta_10ms;
+        double gama = data.encoder_data;
 
+        double r = abs(gama/theta);
+#define square(x) ((x)*(x))
 
-            x_ +=data.encoder_data *h/(h*cos(theta_10ms)-d*sin(theta_10ms)) * cos(theta_integral);
-            y_ +=data.encoder_data *h/(h*cos(theta_10ms)-d*sin(theta_10ms)) * sin(theta_integral);
+        double derta = 0.;
+        if(theta>0.001){//turn left
+          double Rs = sqrt(square(r)-square(h)+d);
+          derta = gama*Rs/r;
+        }else if(theta<-0.001){//turn right
+          double Rs = sqrt(square(r)-square(h)-d);
+          derta = gama*Rs/r;
+        }else{
+          derta = gama;
         }
-            else if(theta_10ms < 0)
-        {
-            theta_integral += theta_10ms;
-            x_ +=data.encoder_data *h/(h*cos(theta_10ms)+d*sin(theta_10ms)) * cos(theta_integral);
-            y_ +=data.encoder_data *h/(h*cos(theta_10ms)+d*sin(theta_10ms)) * sin(theta_integral);
-        }
-            else if(theta_10ms == 0)
-        {
-            theta_integral += theta_10ms;
-            x_ +=data.encoder_data  * cos(theta_integral);
-            y_ +=data.encoder_data  * sin(theta_integral);
-        }
+        derta = derta;
 
-        // x_ += (cos (theta_integral) * delta_x - sin (theta_integral) * delta_y);
-        // y_ += (sin (theta_integral) * delta_x + cos (theta_integral) * delta_y);
-        // theta_integral += theta_10ms;
+        x_ += derta * cos(theta_integral);
+        y_ += derta * sin(theta_integral);
         
-        // linear_x = (cos (theta_integral) * delta_x - sin (theta_integral) * delta_y) / dt;
-        // linear_y = (sin (theta_integral) * delta_x + cos (theta_integral) * delta_y) / dt;
 
         auto now = this->get_clock()->now();
 
