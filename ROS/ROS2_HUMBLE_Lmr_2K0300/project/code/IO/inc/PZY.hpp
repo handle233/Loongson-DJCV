@@ -1,3 +1,4 @@
+#pragma once
 #include <atomic>
 #include <thread>
 #include "LQ_HW_GPIO.hpp"

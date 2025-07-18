@@ -103,19 +103,25 @@ private:
         double dt = (current_time - last_time_).seconds();
         last_time_ = current_time;
         double theta_10ms=wz*dt; 
-
-        //     if (std::fabs(theta_10ms) < 0.02)
-        // {
-        //     x_ += delta_s_;
-        //     y_ += 0.0;
-        // }
-        //     else
+            if(theta_10ms > 0)
         {
             // delta_x = delta_s_ * (sin (theta_10ms) / theta_10ms);
             // delta_y = delta_s_ * ( (1 - cos (theta_10ms) ) / theta_10ms);
             theta_integral += theta_10ms;
-            x_ +=delta_s_ * cos(theta_integral);
-            y_ +=delta_s_ * sin(theta_integral);
+            x_ +=delta_s_ *h/(h*cos(theta_10ms)-d*sin(theta_10ms)) * cos(theta_integral);
+            y_ +=delta_s_ *h/(h*cos(theta_10ms)-d*sin(theta_10ms)) * sin(theta_integral);
+        }
+            else if(theta_10ms < 0)
+        {
+            theta_integral += theta_10ms;
+            x_ +=delta_s_ *h/(h*cos(theta_10ms)+d*sin(theta_10ms)) * cos(theta_integral);
+            y_ +=delta_s_ *h/(h*cos(theta_10ms)+d*sin(theta_10ms)) * sin(theta_integral);
+        }
+            else if(theta_10ms == 0)
+        {
+            theta_integral += theta_10ms;
+            x_ +=delta_s_  * cos(theta_integral);
+            y_ +=delta_s_  * sin(theta_integral);
         }
 
         // x_ += (cos (theta_integral) * delta_x - sin (theta_integral) * delta_y);
@@ -182,6 +188,8 @@ private:
     double delta_s_ = 0.0;
     bool first_time_;
     rclcpp::Time last_time_;
+    const double d = 5.8;
+    const double h = 8.5;
 };
 
 int main(int argc, char *argv[])

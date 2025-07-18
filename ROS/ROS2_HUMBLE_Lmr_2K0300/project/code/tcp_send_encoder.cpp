@@ -46,7 +46,7 @@ void tcp_send_encoder::get_data_thread()
             //printf("Encoder distance: %f\n", encoder_distance_10ms_);
             
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
 
@@ -74,6 +74,6 @@ void tcp_send_encoder::send_data_thread()
             //printf("Encoder data sent: %.2f\n", interg);
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(10)); // 每 10ms 发送一次
+        // std::this_thread::sleep_for(std::chrono::milliseconds(10)); // 每 10ms 发送一次
     }
 }

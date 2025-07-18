@@ -21,17 +21,17 @@ options = {
   submap_publish_period_sec = 0.05, -- 发布子图的时间间隔
   pose_publish_period_sec = 10e-3, -- 发布pose的时间间隔
   trajectory_publish_period_sec = 10e-3, -- 发布轨迹的时间间隔
-  rangefinder_sampling_ratio = 0.8, -- 雷达采样比例
-  odometry_sampling_ratio =0.5 , -- 里程计采样比例(如果里程计精度低，可以减小该设置值)
+  rangefinder_sampling_ratio = 0.6, -- 雷达采样比例
+  odometry_sampling_ratio =0.5, -- 里程计采样比例(如果里程计精度低，可以减小该设置值)
   fixed_frame_pose_sampling_ratio = 0.1, -- 参考坐标系采样比例
-  imu_sampling_ratio = 1.0,-- imu采样比例
+  imu_sampling_ratio = 0.8,-- imu采样比例
   landmarks_sampling_ratio = 1., -- 路标采样比例
 
 }
 
 MAP_BUILDER.use_trajectory_builder_2d = true -- 启用2D轨迹构建器
 
-TRAJECTORY_BUILDER_2D.min_range = 0.15 -- 最小雷达有效距离
+TRAJECTORY_BUILDER_2D.min_range = 0.05 -- 最小雷达有效距离
 TRAJECTORY_BUILDER_2D.max_range = 10 -- 最大雷达有效距离
 TRAJECTORY_BUILDER_2D.missing_data_ray_length = 4. -- 缺失数据的射线长度
 TRAJECTORY_BUILDER_2D.use_imu_data = true -- 是否使用 imu 数据
@@ -39,18 +39,22 @@ TRAJECTORY_BUILDER_2D.use_imu_data = true -- 是否使用 imu 数据
 TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = true -- 是否使用在线相关扫描匹配
 TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(0.2) -- 运动滤波器的最大角度限制（以弧度为单位）
 
-TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.1
-TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_weight = 10.
-TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.05
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_weight = 10.0
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1.0
 
-POSE_GRAPH.optimization_problem.huber_scale = 1e2
-POSE_GRAPH.optimize_every_n_nodes = 35
+POSE_GRAPH.optimization_problem.huber_scale = 100
+POSE_GRAPH.optimize_every_n_nodes = 30
 
 POSE_GRAPH.constraint_builder.min_score = 0.65 -- 建约束时的最小分数
 POSE_GRAPH.constraint_builder.global_localization_min_score = 0.7 -- 全局定位时的最小分数
 POSE_GRAPH.optimization_problem.ceres_solver_options.num_threads = 6
 
+POSE_GRAPH.optimization_problem.odometry_translation_weight = 500
+POSE_GRAPH.optimization_problem.odometry_rotation_weight = 500
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.angular_search_window = math.rad(1.0)
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 10
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 5
 
--- POSE_GRAPH.optimize_every_n_nodes = 0
 
 return options

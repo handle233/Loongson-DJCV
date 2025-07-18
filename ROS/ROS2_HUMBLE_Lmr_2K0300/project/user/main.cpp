@@ -24,7 +24,7 @@ TimerFdWrapper *timer;
 ServoController Servo;
 MotorController Motor;
 tcp_send_imu imu(USB_PATH);  // 创建 imu 对象
-tcp_send_encoder encoder; // 创建编码器对象
+//tcp_send_encoder encoder; // 创建编码器对象
 //LCYX
 
 // 定义线程回调函数，用于处理定时器到期事件
@@ -59,7 +59,7 @@ void cleanup()
     close_tcp_send_ladar();
     close_tcp_recv_control();
     imu.stop();  // 停止IMU数据发送线程
-    encoder.stop(); // 停止编码器数据发送线程
+    // encoder.stop(); // 停止编码器数据发送线程
 
     //LCYX
     Motor.stop();  // 停止电机
@@ -91,7 +91,7 @@ int main(int, char**)
     // TCP接收ROS2的数据，控制车模运动和转向
     ThreadWrapper thd_2(tcp_recv_control_thd_entry);
     imu.start();  // 启动IMU数据发送线程
-    encoder.start(); // 启动编码器数据发送线程
+    // encoder.start(); // 启动编码器数据发送线程
     while(1)
     {
         system_delay_ms(10);  // 延时10ms   
