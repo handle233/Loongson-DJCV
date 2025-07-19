@@ -47,7 +47,7 @@ typedef struct __attribute__((packed))
     // 下面是LCYX的扩展
     int16_t servo_angle; // 添加舵机角度
     int16_t speed;       // 添加车速
-    bool forward;     // 添加前进后退
+    int forward;     // 添加前进后退
     //上面是LCYX的扩展
 } car_control_typedef;
 

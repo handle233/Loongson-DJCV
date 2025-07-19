@@ -77,6 +77,9 @@ void tcp_recv_control_thd_entry(void)
             //判断指定速度是否为0，为0就不更新
             if(tcp_car_control.forward!=0){
                 g_car_control.forward = tcp_car_control.forward;
+                printf("update%d\n",g_car_control.forward);
+            }else{
+                printf("speed 0 no gengxin\n");
             }
             
 

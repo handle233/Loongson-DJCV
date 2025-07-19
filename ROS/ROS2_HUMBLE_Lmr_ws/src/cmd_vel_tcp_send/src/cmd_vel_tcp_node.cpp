@@ -22,7 +22,7 @@ typedef struct __attribute__((packed)) {
     int16_t servo_duty;    // 舵机占空比
     int16_t servo_angle;   // 舵机角度
     int16_t speed;         // 车速
-    bool forward;          // 前进 or 后退
+    int forward;          // 前进 or 后退
 } car_control_typedef;
 
 
@@ -127,11 +127,13 @@ private:
         //左右轮速度计算
         if(abs(msg->linear.x) > 0.0001){//判断速度存在
             car_control.forward = msg->linear.x>0?1:-1;//存在的话判定正负
+            std::cout<<"set forward"<<car_control.forward<<std::endl;
         }else{
             car_control.forward = 0;//自由运动则输出0
+            std::cout<<"no speed"<<std::endl;
         }
-        car_control.left_speed = msg->linear.x*38;
-        car_control.right_speed = msg->linear.x*38;
+        car_control.left_speed = msg->linear.x*130;
+        car_control.right_speed = msg->linear.x*130;
         
         car_control.left_speed = func_limit(car_control.left_speed , 20);
         car_control.right_speed = func_limit(car_control.right_speed , 20);

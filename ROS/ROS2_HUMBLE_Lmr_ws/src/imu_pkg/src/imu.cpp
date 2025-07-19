@@ -71,6 +71,7 @@ private:
   const double d = 5.8;
   const double h = 8.5;
 
+  
 
   void recv_loop() {
     uint8_t temp_buf[128];
@@ -167,6 +168,7 @@ private:
     msg.orientation.z = q[2];
     msg.orientation.w = q[3];
 
+
     msg.orientation_covariance[0] = 0.02;
     msg.orientation_covariance[4] = 0.02;
     msg.orientation_covariance[8] = 0.02;
@@ -229,6 +231,7 @@ private:
         theta_integral += theta;
         //ÇóÎ¢Ð¡Î»ÒÆ
         double gama = data.encoder_data;
+        std::cout<<"way receive"<<data.encoder_data<<std::endl;
 
         double derta = 0.;
         if(abs(theta)>=1e-3){
@@ -267,7 +270,7 @@ private:
         odom_msg.pose.pose.position.z = 0.0;
 
         tf2::Quaternion q1;
-        q1.setRPY(0, 0, theta_integral);
+        q1.setRPY(0, 0, angle_degree_[2] * M_PI / 180.0);
         odom_msg.pose.pose.orientation = tf2::toMsg(q1);
 
         odom_msg.twist.twist.linear.x = data.encoder_data / dt;  // v = s / t (t = 0.01s)
@@ -275,7 +278,7 @@ private:
 
         // odom_msg.twist.twist.linear.x  = linear_x;
         // odom_msg.twist.twist.linear.y  = linear_y;
-        odom_msg.twist.twist.angular.z = theta_integral;
+        // odom_msg.twist.twist.angular.z = theta_integral;
 
         odom_pub_->publish(odom_msg);
 

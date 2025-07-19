@@ -96,9 +96,11 @@ void tcp_send_imu::read_thread()
             int flag = g_car_control.forward;
             double dist = encoder.Get_10ms_dist();
             static double total_dist = 0;
+            //std::cout<<"forward:"<<g_car_control.forward;
 
             total_dist += dist;
             data.encoder_data = flag>0 ? dist : -dist;
+            //std::cout<<"way on board:"<<data.encoder_data<<std::endl;
             //printf("total distance: %f\n", total_dist);  
             {
                 std::lock_guard<std::mutex> lock(queue_mutex);
