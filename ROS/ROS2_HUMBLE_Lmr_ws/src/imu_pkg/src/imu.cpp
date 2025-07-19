@@ -68,8 +68,8 @@ private:
   // double delta_s_ = 0.0;
   bool first_time_;
   rclcpp::Time last_time_;
-  const double d = 5.8;
-  const double h = 8.5;
+  const double d = 0.058;
+  const double h = 0.085;
 
   
 
@@ -230,28 +230,29 @@ private:
         //给航向角积分
         theta_integral += theta;
         //求微小位移
-        double gama = data.encoder_data;
-        std::cout<<"way receive"<<data.encoder_data<<std::endl;
+        double left_distance = data.encoder_data;
+        double increment_s = 2*d*tan(theta); // 右轮计算微小位移增
+        std::cout<<"way receive"<<increment_s<<std::endl;
 
         double derta = 0.;
         if(abs(theta)>=1e-3){
-          double r = abs(gama/theta);
-          if(r<0.1*1e-3){
-            return;
-          }
-  #define square(x) ((x)*(x))
-          double Rs = abs(ax*dt/wz);
+        //   double r = abs(gama/theta);
+        //   if(r<0.1*1e-3){
+        //     return;
+        //   }
+  // #define square(x) ((x)*(x))
+          // double Rs = abs(ax*dt/wz);
           if(theta>0){//turn left
             // Rs = sqrt(square(r)-square(h*1e-2))+d*1e-2;
-            derta = gama*Rs/r;
+            derta = left_distance + increment_s/2;
           }else if(theta<0){//turn right
             // Rs = sqrt(square(r)-square(h*1e-2))-d*1e-2;
-            derta = gama*Rs/r;
+            derta = left_distance - increment_s/2;
           }
-          std::cout<<"r"<<r<<"theta "<<theta<<"Rs"<<Rs<<std::endl;
+          // std::cout<<"r"<<r<<"theta "<<theta<<"Rs"<<Rs<<std::endl;
   
         }else{
-          derta = gama;
+          derta = left_distance; // 当角速度接近0时，直接使用编码器数据作为位移
         }
           x_ += derta * cos(theta_integral);
           y_ += derta * sin(theta_integral);
