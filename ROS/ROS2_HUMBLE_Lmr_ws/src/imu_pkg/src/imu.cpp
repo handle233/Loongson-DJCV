@@ -62,7 +62,7 @@ private:
   uint8_t buf[sizeof(data_pack)];
   
 
-  double x_, y_, theta_,theta_integral,wz;
+  double x_, y_, theta_,theta_integral,wz,ax;
   // double delta_x, delta_y,linear_x,linear_y;
   double roll_, pitch_;
   // double delta_s_ = 0.0;
@@ -154,6 +154,7 @@ private:
     msg.linear_acceleration.x = acceleration_[0];
     msg.linear_acceleration.y = acceleration_[1];
     msg.linear_acceleration.z = acceleration_[2];
+    ax=acceleration_[0];
 
     msg.angular_velocity.x = angular_velocity_[0];
     msg.angular_velocity.y = angular_velocity_[1];
@@ -229,21 +230,28 @@ private:
         //求微小位移
         double gama = data.encoder_data;
 
-        if(abs(theta)>=1e-3){
-
+          double derta = 0.;
+        if(abs(theta)>=1e-2){
+          double r = abs(gama/theta);
+          if(r<0.1*1e-3){
+            return;
+          }
+  #define square(x) ((x)*(x))
+          double Rs = abs(ax*dt/wz);
           if(theta>0){//turn left
-            derta = gama/0.94;
+            // Rs = sqrt(square(r)-square(h*1e-2))+d*1e-2;
+            derta = gama*Rs/r;
           }else if(theta<0){//turn right
-            double Rs = sqrt(square(r)-square(h)-d);
+            // Rs = sqrt(square(r)-square(h*1e-2))-d*1e-2;
             derta = gama*Rs/r;
           }
+          std::cout<<"r"<<r<<"theta "<<theta<<"Rs"<<Rs<<std::endl;
   
         }else{
           derta = gama;
         }
-        //应用到全局里程计
-        x_ += derta * cos(theta_integral);
-        y_ += derta * sin(theta_integral);
+          x_ += derta * cos(theta_integral);
+          y_ += derta * sin(theta_integral);
         
 
         auto now = this->get_clock()->now();

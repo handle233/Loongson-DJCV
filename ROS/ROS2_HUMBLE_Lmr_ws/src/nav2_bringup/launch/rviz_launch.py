@@ -44,7 +44,7 @@ def generate_launch_description():
     # 这个 RViz 配置文件位于 e07_nav2_bringup 包中的 rviz 目录下，文件名为 nav2_default_view.rviz
     # 它决定了 RViz 打开时默认加载哪些显示项（如地图、激光雷达、路径规划线等）
     rviz2_config = os.path.join(
-        get_package_share_directory('e07_nav2_bringup'),  # 获取包路径
+        get_package_share_directory('nav2_bringup'),  # 获取包路径
         'rviz',                                            # 子文件夹
         'nav2_default_view.rviz'                           # 配置文件名
     )
