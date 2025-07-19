@@ -222,30 +222,28 @@ private:
         double dt = (current_time - last_time_).seconds();
         //std::cout<<"dt:"<<dt<<std::endl;
         last_time_ = current_time;
+        //求航向角微小变化量
         double theta=wz*dt; 
-
+        //给航向角积分
         theta_integral += theta;
-
+        //求微小位移
         double gama = data.encoder_data;
 
-        if(abs(theta)<=1e-3){
-          double r = abs(gama/theta);
-  #define square(x) ((x)*(x))
-  
-          double derta = 0.;
+        if(abs(theta)>=1e-3){
+
           if(theta>0){//turn left
-            double Rs = sqrt(square(r)-square(h)+d);
-            derta = gama*Rs/r;
+            derta = gama/0.94;
           }else if(theta<0){//turn right
             double Rs = sqrt(square(r)-square(h)-d);
             derta = gama*Rs/r;
           }
   
-          x_ += derta * cos(theta_integral);
-          y_ += derta * sin(theta_integral);
         }else{
           derta = gama;
         }
+        //应用到全局里程计
+        x_ += derta * cos(theta_integral);
+        y_ += derta * sin(theta_integral);
         
 
         auto now = this->get_clock()->now();
