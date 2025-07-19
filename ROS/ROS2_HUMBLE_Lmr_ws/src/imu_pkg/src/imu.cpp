@@ -62,7 +62,7 @@ private:
   uint8_t buf[sizeof(data_pack)];
   
 
-  double x_, y_, theta_,theta_integral,wz;
+  double x_, y_, theta_,theta_integral,wz,ax;
   // double delta_x, delta_y,linear_x,linear_y;
   double roll_, pitch_;
   // double delta_s_ = 0.0;
@@ -154,6 +154,7 @@ private:
     msg.linear_acceleration.x = acceleration_[0];
     msg.linear_acceleration.y = acceleration_[1];
     msg.linear_acceleration.z = acceleration_[2];
+    ax=acceleration_[0];
 
     msg.angular_velocity.x = angular_velocity_[0];
     msg.angular_velocity.y = angular_velocity_[1];
@@ -235,12 +236,12 @@ private:
             return;
           }
   #define square(x) ((x)*(x))
-          double Rs = 0.;
+          double Rs = abs(ax*dt/wz);
           if(theta>0){//turn left
-            Rs = sqrt(square(r)-square(h*1e-2))+d*1e-2;
+            // Rs = sqrt(square(r)-square(h*1e-2))+d*1e-2;
             derta = gama*Rs/r;
           }else if(theta<0){//turn right
-            Rs = sqrt(square(r)-square(h*1e-2))-d*1e-2;
+            // Rs = sqrt(square(r)-square(h*1e-2))-d*1e-2;
             derta = gama*Rs/r;
           }
           std::cout<<"r"<<r<<"theta "<<theta<<"Rs"<<Rs<<std::endl;

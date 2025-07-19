@@ -12,7 +12,7 @@ from nav2_common.launch import RewrittenYaml
 
 def generate_launch_description():
     # 获取导航包的共享目录
-    bringup_dir = get_package_share_directory('e07_nav2_bringup')
+    bringup_dir = get_package_share_directory('nav2_bringup')
 
     # 声明命名空间配置，默认为空字符串
     namespace = LaunchConfiguration('namespace', default='')

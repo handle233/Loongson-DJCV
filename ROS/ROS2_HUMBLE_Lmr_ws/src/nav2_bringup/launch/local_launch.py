@@ -18,7 +18,7 @@ from nav2_common.launch import RewrittenYaml  # 用于在launch时动态修改ya
 def generate_launch_description():
 
     # 获取 e07_nav2_bringup 包的路径，后面加载参数文件和地图文件需要用到
-    nav2_dir = get_package_share_directory('e07_nav2_bringup')
+    nav2_dir = get_package_share_directory('nav2_bringup')
 
     # 创建LaunchConfiguration对象，允许用户在launch命令行传参
     namespace = LaunchConfiguration('namespace')                 # 命名空间
