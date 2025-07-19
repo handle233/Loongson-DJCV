@@ -230,8 +230,8 @@ private:
         //ÇóÎ¢Ð¡Î»ÒÆ
         double gama = data.encoder_data;
 
-          double derta = 0.;
-        if(abs(theta)>=1e-2){
+        double derta = 0.;
+        if(abs(theta)>=1e-3){
           double r = abs(gama/theta);
           if(r<0.1*1e-3){
             return;
