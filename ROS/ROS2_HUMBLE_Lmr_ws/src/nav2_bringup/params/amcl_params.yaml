@@ -61,8 +61,8 @@ amcl:
     #robot_model_type: "nav2_amcl::DifferentialMotionModel"  # 差分驱动机器人模型
     # 其他可选模型："nav2_amcl::KinematicModel"（运动学模型）、"nav2_amcl::OmnidirectionalModel"（全向模型）
     # 修改为适用于阿克曼结构的运动模型
-    robot_model_type: "nav2_amcl::DifferentialMotionModel"  # 原配置，适用于差速驱动
-    # robot_model_type: "nav2_amcl::KinematicModel"             # 修改：适用于阿克曼结构
+    #robot_model_type: "nav2_amcl::DifferentialMotionModel"  # 原配置，适用于差速驱动
+    robot_model_type: "nav2_amcl::KinematicModel"             # 修改：适用于阿克曼结构
 
     # # 运动模型误差参数（可根据实际调整）
     # odom_alpha1: 0.1  # 旋转引起的旋转误差
