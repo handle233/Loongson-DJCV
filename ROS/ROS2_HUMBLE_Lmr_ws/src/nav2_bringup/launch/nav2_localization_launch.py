@@ -10,7 +10,7 @@ from ament_index_python.packages import get_package_share_directory  # 用于获
 
 def generate_launch_description():
     # 获取“e07_nav2_bringup”包的 share 路径，也就是该包中包含 launch 文件的路径
-    pkg_share = get_package_share_directory("e07_nav2_bringup")
+    pkg_share = get_package_share_directory("nav2_bringup")
 
     # 启动 RViz2 可视化界面，便于我们实时查看地图、机器人位置、路径等
     rviz_launch = IncludeLaunchDescription(

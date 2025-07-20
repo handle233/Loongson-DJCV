@@ -11,7 +11,7 @@ amcl:  # AMCL定位节点参数
     alpha4: 0.05                     # 旋转引起的平移噪声（旋转时的横向滑动）
     alpha5: 0.1                      # 系统偏差噪声（长期累积的系统性误差）
 
-    base_frame_id: "base_footprint"  # 机器人基坐标系
+    base_frame_id: "base_link"  # 机器人基坐标系
     beam_skip_distance: 0.5          # 激光束跳过距离阈值
     beam_skip_error_threshold: 0.9   # 激光束跳过误差阈值
     beam_skip_threshold: 0.3         # 激光束跳过比例阈值
