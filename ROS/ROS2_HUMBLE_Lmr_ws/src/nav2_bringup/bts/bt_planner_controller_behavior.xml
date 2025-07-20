@@ -44,7 +44,7 @@
           <!-- Wait：等待5秒 -->
           <Wait wait_duration="5"/>
           <!-- BackUp：后退0.3米，速度0.05米/秒 -->
-          <BackUp backup_dist="0.30" backup_speed="0.05"/>
+          <BackUp backup_dist="0.10" backup_speed="0.1"/>
         </RoundRobin>
       </ReactiveFallback>
     </RecoveryNode>

@@ -117,11 +117,11 @@ bt_navigator_navigate_to_pose_rclcpp_node:  # 导航到单个位姿的行为树�
 controller_server:  # 控制器服务器参数
   ros__parameters:
     use_sim_time: False  # 是否使用仿真时间
-    controller_frequency: 5.0  # 控制器执行频率(Hz)
-    min_x_velocity_threshold: 0.001  # 最小X方向速度阈值，低于此值视为静止
+    controller_frequency: 10.0  # 控制器执行频率(Hz)
+    min_x_velocity_threshold: 0.099  # 最小X方向速度阈值，低于此值视为静止
     min_y_velocity_threshold: 0.5  # 最小Y方向速度阈值，低于此值视为静止
     min_theta_velocity_threshold: 0.001  # 最小角速度阈值，低于此值视为静止
-    failure_tolerance: 0.3  # 控制器失败容忍度
+    failure_tolerance: 0.4  # 控制器失败容忍度
     progress_checker_plugin: "progress_checker"  # 进度检查器插件名称
     goal_checker_plugins: ["general_goal_checker"] # "precise_goal_checker"  # 目标检查器插件列表
     controller_plugins: ["FollowPath"]  # 控制器插件列表，这里使用DWB路径跟随器
@@ -129,7 +129,7 @@ controller_server:  # 控制器服务器参数
     # Progress checker parameters
     progress_checker:
       plugin: "nav2_controller::SimpleProgressChecker"  # 简单进度检查器插件
-      required_movement_radius: 0.5  # 要求的最小移动半径(米)
+      required_movement_radius: 0.4 # 要求的最小移动半径(米)
       movement_time_allowance: 3.0  # 允许的最大移动时间(秒)
     # Goal checker parameters
     #precise_goal_checker:
@@ -146,14 +146,18 @@ controller_server:  # 控制器服务器参数
     FollowPath:
       plugin: "dwb_core::DWBLocalPlanner"  # DWB局部规划器插件
       debug_trajectory_details: True  # 是否输出轨迹调试信息
-      min_vel_x: 0.0  # 最小X方向速度(米/秒)
+      min_vel_x: -0.12  # 最小X方向速度(米/秒)
       min_vel_y: 0.0  # 最小Y方向速度(米/秒)，差速驱动机器人通常为0
-      max_vel_x: 1.0  # 最大X方向速度(米/秒)
+      max_vel_x: 0.12  # 最大X方向速度(米/秒)
       max_vel_y: 0.0  # 最大Y方向速度(米/秒)，差速驱动机器人通常为0
-      max_vel_theta: 3.0  # 最大角速度(弧度/秒)
-      min_speed_xy: 0.0  # 最小XY平面合速度(米/秒)
+      max_vel_theta: 2.0  # 最大角速度(弧度/秒)
+      min_speed_xy: 0.1  # 最小XY平面合速度(米/秒)
       max_speed_xy: 1.0  # 最大XY平面合速度(米/秒)
-      min_speed_theta: 0.1  # 最小角速度(弧度/秒)
+      min_speed_theta: 0.8 # 最小角速度(弧度/秒)
+
+      path_distance_bias: 8.0
+      goal_distance_bias: 26.0
+
       # Add high threshold velocity for turtlebot 3 issue.
       # https://github.com/ROBOTIS-GIT/turtlebot3_simulations/issues/75
       acc_lim_x: 0.05  # X方向加速度限制(米/秒²)
@@ -183,7 +187,7 @@ controller_server:  # 控制器服务器参数
       GoalDist.scale: 24.0  # 目标距离评价器权重
       RotateToGoal.scale: 32.0  # 旋转到目标评价器权重
       RotateToGoal.slowing_factor: 5.0  # 旋转减速因子
-      RotateToGoal.lookahead_time: -1.0  # 旋转前瞻时间(秒)，-1表示使用默认值
+      RotateToGoal.lookahead_time: 0.1  # 旋转前瞻时间(秒)，-1表示使用默认值
 
 local_costmap:  # 局部代价地图配置
   local_costmap:
@@ -197,12 +201,12 @@ local_costmap:  # 局部代价地图配置
       width: 1  # 地图宽度(米)
       height: 1  # 地图高度(米)
       resolution: 0.02  # 地图分辨率(米/像素)
-      robot_radius: 0.10  # 机器人半径(米)
+      robot_radius: 0.08  # 机器人半径(米)
       plugins: ["voxel_layer", "inflation_layer"]  # 使用的插件列表
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"  # 膨胀层插件
-        cost_scaling_factor: 0.01  # 代价缩放因子，越小膨胀区域代价越高
-        inflation_radius: 0.2  # 膨胀半径(米)
+        cost_scaling_factor: 0.02 # 代价缩放因子，越小膨胀区域代价越高
+        inflation_radius: 0.1  # 膨胀半径(米)
       voxel_layer:
         plugin: "nav2_costmap_2d::VoxelLayer"  # 体素层插件
         enabled: True  # 是否启用
@@ -235,8 +239,8 @@ local_costmap:  # 局部代价地图配置
 global_costmap:  # 全局代价地图配置
   global_costmap:
     ros__parameters:
-      update_frequency: 1.0  # 地图更新频率(Hz)
-      publish_frequency: 1.0  # 地图发布频率(Hz)
+      update_frequency: 2.0  # 地图更新频率(Hz)
+      publish_frequency: 2.0  # 地图发布频率(Hz)
       global_frame: map  # 全局坐标系
       robot_base_frame: base_link  # 机器人基坐标系
       use_sim_time: False  # 是否使用仿真时间
@@ -267,8 +271,8 @@ global_costmap:  # 全局代价地图配置
         map_subscribe_transient_local: True  # 使用临时本地订阅模式
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"  # 膨胀层插件
-        cost_scaling_factor: 4.0  # 代价缩放因子
-        inflation_radius: 0.20  # 膨胀半径(米)
+        cost_scaling_factor: 3.0  # 代价缩放因子
+        inflation_radius: 0.1  # 膨胀半径(米)
       always_send_full_costmap: True  # 是否始终发送完整代价地图
 
 map_server:  # 地图服务器参数
@@ -294,8 +298,8 @@ planner_server:  # 规划器服务器参数
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"  # 基于导航函数的全局规划器
       tolerance: 0.5  # 规划容忍度(米)
-      use_astar: false  # 是否使用A*算法，false则使用Dijkstra算法
-      allow_unknown: true  # 是否允许规划穿过未知区域
+      use_astar: true  # 是否使用A*算法，false则使用Dijkstra算法
+      allow_unknown: false  # 是否允许规划穿过未知区域
 
 smoother_server:  # 平滑器服务器参数
   ros__parameters:
@@ -329,8 +333,8 @@ behavior_server:  # 行为服务器参数
     use_sim_time: False  # 是否使用仿真时间
     simulate_ahead_time: 2.0  # 前向模拟时间(秒)
     max_rotational_vel: 1.0  # 最大旋转速度(弧度/秒)
-    min_rotational_vel: 0.2  # 最小旋转速度(弧度/秒)
-    rotational_acc_lim: 0.2  # 旋转加速度限制(弧度/秒²)
+    min_rotational_vel: 0.8  # 最小旋转速度(弧度/秒)
+    rotational_acc_lim: 1.  # 旋转加速度限制(弧度/秒²)
 
 robot_state_publisher:  # 机器人状态发布器参数
   ros__parameters:
@@ -357,8 +361,8 @@ velocity_smoother:  # 速度平滑器参数
     min_velocity: [-1.0, 0.0, -3.0]  # 最小速度[x, y, theta]，单位：米/秒，弧度/秒
     # max_velocity: [30, 0.0, 70]
     # min_velocity: [-30, 0.0, -70]
-    max_accel: [0.1, 0.0, 0.2]  # 最大加速度[x, y, theta]，单位：米/秒²，弧度/秒²
-    max_decel: [-0.1, 0.0, -0.2]  # 最大减速度[x, y, theta]，单位：米/秒²，弧度/秒²
+    max_accel: [0.6, 0.0, 1.]  # 最大加速度[x, y, theta]，单位：米/秒²，弧度/秒²
+    max_decel: [-0.6, 0.0, -1.]  # 最大减速度[x, y, theta]，单位：米/秒²，弧度/秒²
     # max_accel: [4.0, 0.0, 5.0]
     # max_decel: [-4.0, 0.0, -5.0]
     odom_topic: "odom"  # 里程计话题

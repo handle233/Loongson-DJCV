@@ -122,7 +122,7 @@ private:
         float akm_angle = AX_AKM_WToAngle(msg->linear.x, msg->angular.z);
         float radius = AKM_ACLE_BASE / tan(akm_angle);
         float akm_angle_deg = akm_angle * 180.0f / PI;
-        float akm_angle_deg_n =3.5 * akm_angle_deg;
+        float akm_angle_deg_n =3.5 * akm_angle_deg*8;
 
         //左右轮速度计算
         if(abs(msg->linear.x) > 0.0001){//判断速度存在
