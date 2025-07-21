@@ -201,12 +201,12 @@ local_costmap:  # 局部代价地图配置
       width: 1  # 地图宽度(米)
       height: 1  # 地图高度(米)
       resolution: 0.02  # 地图分辨率(米/像素)
-      robot_radius: 0.08  # 机器人半径(米)
+      robot_radius: 0.1  # 机器人半径(米)
       plugins: ["voxel_layer", "inflation_layer"]  # 使用的插件列表
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"  # 膨胀层插件
-        cost_scaling_factor: 0.02 # 代价缩放因子，越小膨胀区域代价越高
-        inflation_radius: 0.2  # 膨胀半径(米)
+        cost_scaling_factor: 0.05 # 代价缩放因子，越小膨胀区域代价越高
+        inflation_radius: 0.1  # 膨胀半径(米)
       voxel_layer:
         plugin: "nav2_costmap_2d::VoxelLayer"  # 体素层插件
         enabled: True  # 是否启用
@@ -244,7 +244,7 @@ global_costmap:  # 全局代价地图配置
       global_frame: map  # 全局坐标系
       robot_base_frame: base_link  # 机器人基坐标系
       use_sim_time: False  # 是否使用仿真时间
-      robot_radius: 0.05  # 机器人半径(米)
+      robot_radius: 0.12  # 机器人半径(米)
       resolution: 0.02  # 地图分辨率(米/像素)
       track_unknown_space: true  # 是否跟踪未知空间
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]  # 使用的插件列表
@@ -271,8 +271,8 @@ global_costmap:  # 全局代价地图配置
         map_subscribe_transient_local: True  # 使用临时本地订阅模式
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"  # 膨胀层插件
-        cost_scaling_factor: 3.0  # 代价缩放因子
-        inflation_radius: 0.1  # 膨胀半径(米)
+        cost_scaling_factor: 2.0  # 代价缩放因子
+        inflation_radius: 0.25  # 膨胀半径(米)
       always_send_full_costmap: True  # 是否始终发送完整代价地图
 
 map_server:  # 地图服务器参数
