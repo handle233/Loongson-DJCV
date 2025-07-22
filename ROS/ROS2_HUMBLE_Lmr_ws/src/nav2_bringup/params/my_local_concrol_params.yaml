@@ -1,0 +1,5 @@
+controller_server:
+  ros__parameters:
+    controller_plugins: ["MyLocal"]
+    MyLocal:
+      plugin: "my_local_control::MyLocalController"
