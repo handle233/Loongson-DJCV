@@ -1,0 +1,8 @@
+<library path="pid_path_tracker_plugin">
+  <class type="pid_path_tracker::PIDPathTracker"
+         base_class_type="nav2_core::Controller">
+    <description>
+      A PID-based path tracking controller for ROS 2 Nav2.
+    </description>
+  </class>
+</library>
