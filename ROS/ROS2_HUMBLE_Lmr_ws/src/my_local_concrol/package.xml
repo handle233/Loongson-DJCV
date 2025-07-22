@@ -1,5 +1,5 @@
 <package format="3">
-  <name>my_local_concrol</name>
+  <name>my_local_control</name>
   <version>0.0.1</version>
   <description>Simple DWB-like local planner for Nav2</description>
   <maintainer email="lcyx@todo.todo">you</maintainer>

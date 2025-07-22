@@ -13,7 +13,7 @@ def generate_launch_description():
     namespace = LaunchConfiguration('namespace', default='')
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
     autostart = LaunchConfiguration('autostart', default='true')
-    params_file = LaunchConfiguration('params_file', default=os.path.join(bringup_dir, 'params', 'my_local_concrol_params.yaml'))
+    params_file = LaunchConfiguration('params_file', default=os.path.join(bringup_dir, 'params', 'my_local_control_params.yaml'))
     use_respawn = LaunchConfiguration('use_respawn', default='False')
     log_level = LaunchConfiguration('log_level', default='info')
 
@@ -46,7 +46,7 @@ def generate_launch_description():
 
     declare_namespace_cmd = DeclareLaunchArgument('namespace', default_value='')
     declare_use_sim_time_cmd = DeclareLaunchArgument('use_sim_time', default_value='false')
-    declare_params_file_cmd = DeclareLaunchArgument('params_file', default_value=os.path.join(bringup_dir, 'params', 'my_local_concrol_params.yaml'))
+    declare_params_file_cmd = DeclareLaunchArgument('params_file', default_value=os.path.join(bringup_dir, 'params', 'my_local_control_params.yaml'))
     declare_autostart_cmd = DeclareLaunchArgument('autostart', default_value='true')
     declare_use_respawn_cmd = DeclareLaunchArgument('use_respawn', default_value='False')
     declare_log_level_cmd = DeclareLaunchArgument('log_level', default_value='info')
