@@ -17,7 +17,8 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <export>
-  <pluginlib plugin_manifest_file="controller_plugin.xml"/>
+    <build_type>ament_cmake</build_type>
+    <nav2_core plugin="${prefix}/controller_plugin.xml" />
   </export>
 
 
