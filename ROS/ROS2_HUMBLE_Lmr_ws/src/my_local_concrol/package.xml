@@ -16,4 +16,9 @@
   <depend>pluginlib</depend>
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <export>
+  <pluginlib plugin_manifest_file="controller_plugin.xml"/>
+  </export>
+
+
 </package>
