@@ -151,7 +151,7 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
     for (const auto & global_pose : global_plan_.poses) {
       geometry_msgs::msg::PoseStamped transformed_pose;
       tf_->transform(
-        global_pose, transformed_pose, costmap_ros_->getBaseFrameID(),
+        global_pose, transformed_pose, "map",
         tf2::durationFromSec(transform_tolerance_));
       transformed_plan.poses.push_back(transformed_pose);
     }
