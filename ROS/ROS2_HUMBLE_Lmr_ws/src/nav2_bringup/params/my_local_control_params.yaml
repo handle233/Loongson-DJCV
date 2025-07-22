@@ -127,17 +127,19 @@ bt_navigator_navigate_to_pose_rclcpp_node:  # 导航到单个位姿的行为树�
     # controller_plugins: ["FollowPath"]  # 控制器插件列表，这里使用DWB路径跟随器
 controller_server:
   ros__parameters:
-    #... 其他 controller_server 参数，如 controller_frequency: 20.0...
-    
+    use_sim_time: False  # 是否使用仿真时间
+    controller_frequency: 10.0  # 控制器执行频率(Hz)
+    progress_checker_plugin: "progress_checker"  # 进度检查器插件名称
     # 1. 在插件列表中添加一个唯一的实例名称
-    controller_plugins: ["PIDTracker"] # 可以是 "FollowPath", "PIDTracker" 等
+    controller_plugins: ["FollowPath"] # 可以是 "FollowPath", "PIDTracker" 等
 
     # 2. 为该实例名称创建一个配置块
-    PIDTracker:
+    FollowPath:
       # 3. 指定要加载的插件类型
       plugin: "pid_path_tracker::PIDPathTracker"
       
       # 4. 配置该插件实例的所有自定义参数
+      robot_base_frame: base_link
       lookahead_dist: 0.2
       desired_linear_vel: 0.1
       max_angular_vel: 1.0

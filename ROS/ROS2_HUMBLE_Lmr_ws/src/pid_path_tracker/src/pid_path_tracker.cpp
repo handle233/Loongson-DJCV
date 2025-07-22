@@ -141,11 +141,13 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
   cmd_vel->header.frame_id = costmap_ros_->getBaseFrameID();
   cmd_vel->header.stamp = clock_->now();
 
+  // 如果没有路径，则停止
   if (global_plan_.poses.empty()) {
     RCLCPP_WARN(logger_, "Received empty plan, stopping the robot.");
     return *cmd_vel;
   }
 
+  // 步骤 1: 变换全局路径至机器人局部坐标系 (base_link)
   nav_msgs::msg::Path transformed_plan;
   try {
     for (const auto & global_pose : global_plan_.poses) {
@@ -157,10 +159,11 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
     }
   } catch (const tf2::TransformException & ex) {
     RCLCPP_ERROR(logger_, "Could not transform the global plan to the robot's frame: %s", ex.what());
-    return *cmd_vel; 
+    return *cmd_vel; // 返回零速指令
   }
   local_plan_pub_->publish(transformed_plan);
 
+  // 步骤 2: 搜索下一个目标点 (lookahead point)
   geometry_msgs::msg::PoseStamped target_waypoint;
   bool target_found = false;
   for (const auto & pose_local : transformed_plan.poses) {
@@ -175,6 +178,7 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
     target_waypoint = transformed_plan.poses.back();
   }
 
+  // 可视化 lookahead point
   visualization_msgs::msg::Marker marker;
   marker.header.frame_id = costmap_ros_->getBaseFrameID();
   marker.header.stamp = clock_->now();
@@ -192,20 +196,25 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
   marker.color.b = 1.0;
   lookahead_pub_->publish(marker);
 
+  // 步骤 3: 计算控制值
   double lateral_error = target_waypoint.pose.position.y;
+  // ** FIX: Use computeCommand for older API **
   rclcpp::Time now = clock_->now();
   rclcpp::Duration duration = now - last_time_;
   double dt_ = duration.seconds();
   if (dt_ < 1e-6) {
-    dt_ = 1e-3;
+     dt_ = 1e-3;
   }
   last_time_ = now;
-  double angular_velocity = pid_->computeCommand(lateral_error, dt_);
 
+  double angular_velocity = pid_->computeCommand(lateral_error, dt_);
+  // 限制角速度
   angular_velocity = std::clamp(angular_velocity, -max_angular_vel_, max_angular_vel_);
 
+  // 步骤 4: 安全性 - 碰撞检测
   double linear_velocity = std::min(desired_linear_vel_, speed_limit_);
-
+  
+  // 简单的前向碰撞检测：模拟未来 1.0 秒的轨迹
   double sim_time = 1.0;
   int num_steps = 10;
   double dt = sim_time / num_steps;
@@ -219,21 +228,23 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
     unsigned int mx, my;
     if (!costmap_ros_->getCostmap()->worldToMap(current_x, current_y, mx, my)) {
       RCLCPP_WARN(logger_, "Projected path is out of costmap bounds. Stopping.");
-      return *cmd_vel; 
+      return *cmd_vel; // 零速
     }
 
     unsigned char cost = costmap_ros_->getCostmap()->getCost(mx, my);
     if (cost >= nav2_costmap_2d::INSCRIBED_INFLATED_OBSTACLE) {
       RCLCPP_WARN(logger_, "Collision ahead! Stopping the robot.");
-      return *cmd_vel; 
+      return *cmd_vel; // 零速
     }
   }
 
+  // 步骤 5: 发布指令
   cmd_vel->twist.linear.x = linear_velocity;
   cmd_vel->twist.angular.z = angular_velocity;
 
   return *cmd_vel;
 }
+
 
 }  // namespace pid_path_tracker
 
