@@ -38,7 +38,17 @@ void MyLocalController::configure(
     cmd_vel.header.stamp = node_->now();
     cmd_vel.header.frame_id = "base_link";
 
-    auto target = current_pose.pose;
+    auto target = global_plan_.poses[0].pose;
+using namespace std;
+    cout<<"num of poses "<<global_plan_.poses.size()<<" "<<endl;
+    cout<<"my pos "<<current_pose.pose.position.x<<" "<<current_pose.pose.position.y
+    <<" "<<current_pose.pose.orientation.z<<endl;
+
+    for(auto &i : global_plan_.poses){
+      cout<<"x "<<i.pose.position.x<<" y "<<i.pose.position.y;
+      cout<<" z "<<i.pose.orientation.z<<endl;
+    }
+
 
     double dx = target.position.x - current_pose.pose.position.x;
     double dy = target.position.y - current_pose.pose.position.y;
@@ -48,11 +58,13 @@ void MyLocalController::configure(
     double angle_to_target = std::atan2(dy, dx);
     double angle_error = angle_to_target - yaw;
 
-    cmd_vel.twist.linear.x = std::min(0.5, distance);
-    cmd_vel.twist.angular.z = std::clamp(angle_error, -1.0, 1.0);
+    cmd_vel.twist.linear.x = 0 ;//std::max(0.11, distance);
+    cmd_vel.twist.angular.z = 0;//std::clamp(angle_error, -1.0, 1.0)*0.1;
 
     return cmd_vel;
   }
+
+  
 
   void MyLocalController::setPlan(const nav_msgs::msg::Path & path)
   {

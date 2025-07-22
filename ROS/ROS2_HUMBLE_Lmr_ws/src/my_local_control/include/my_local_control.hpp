@@ -27,12 +27,17 @@ public:
   void cleanup() override ;
   void activate() override ;
   void deactivate() override ;
+  
+  
+    nav_msgs::msg::Path transformGlobalPlan(
+        const geometry_msgs::msg::PoseStamped & pose)
+    ;
 
-  geometry_msgs::msg::TwistStamped computeVelocityCommands(
-    const geometry_msgs::msg::PoseStamped & current_pose,
-    const geometry_msgs::msg::Twist & velocity,
-    nav2_core::GoalChecker * /*goal_checker*/) override
-  ;
+    geometry_msgs::msg::TwistStamped computeVelocityCommands(
+        const geometry_msgs::msg::PoseStamped & current_pose,
+        const geometry_msgs::msg::Twist & velocity,
+        nav2_core::GoalChecker * /*goal_checker*/) override
+    ;
 
   void setPlan(const nav_msgs::msg::Path & path) override
   ;
