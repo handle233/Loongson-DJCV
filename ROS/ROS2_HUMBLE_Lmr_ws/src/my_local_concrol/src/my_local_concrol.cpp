@@ -19,7 +19,7 @@ public:
   void configure(
     const rclcpp_lifecycle::LifecycleNode::WeakPtr & parent,
     std::string name,
-    const std::shared_ptr<tf2_ros::Buffer> & tf,
+    std::shared_ptr<tf2_ros::Buffer>  tf,
     std::shared_ptr<nav2_costmap_2d::Costmap2DROS> costmap_ros) override
   {
     node_ = parent.lock();
@@ -35,19 +35,14 @@ public:
 
   geometry_msgs::msg::TwistStamped computeVelocityCommands(
     const geometry_msgs::msg::PoseStamped & current_pose,
-    const geometry_msgs::msg::PoseStamped & goal_pose,
-    const nav_msgs::msg::Path & global_plan) override
+    const geometry_msgs::msg::Twist & velocity,
+    nav2_core::GoalChecker * /*goal_checker*/) override
   {
     geometry_msgs::msg::TwistStamped cmd_vel;
     cmd_vel.header.stamp = node_->now();
     cmd_vel.header.frame_id = "base_link";
 
-    if (global_plan.poses.empty()) {
-      RCLCPP_WARN(node_->get_logger(), "Empty global plan");
-      return cmd_vel;
-    }
-
-    auto target = global_plan.poses.front().pose;
+    auto target = current_pose.pose;
 
     double dx = target.position.x - current_pose.pose.position.x;
     double dy = target.position.y - current_pose.pose.position.y;
