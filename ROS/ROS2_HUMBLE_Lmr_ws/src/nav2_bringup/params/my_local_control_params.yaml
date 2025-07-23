@@ -126,7 +126,7 @@ controller_server:
       plugin: "pid_path_tracker::PIDPathTracker"
       robot_base_frame: base_link
       lookahead_dist: 0.2
-      desired_linear_vel: 0.09
+      desired_linear_vel: 0.08
       max_angular_vel: 0.2
       transform_tolerance: 0.5
       pid:
@@ -150,7 +150,7 @@ local_costmap:  # 局部代价地图配置
   local_costmap:
     ros__parameters:
       update_frequency: 5.0  # 地图更新频率(Hz)
-      publish_frequency: 2.0  # 地图发布频率(Hz)
+      publish_frequency: 3.0  # 地图发布频率(Hz)
       global_frame: odom  # 全局坐标系
       robot_base_frame: base_link  # 机器人基坐标系
       use_sim_time: False  # 是否使用仿真时间
@@ -228,8 +228,8 @@ global_costmap:  # 全局代价地图配置
         map_subscribe_transient_local: True  # 使用临时本地订阅模式
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"  # 膨胀层插件
-        cost_scaling_factor: 2.0  # 代价缩放因子
-        inflation_radius: 0.25  # 膨胀半径(米)
+        cost_scaling_factor: 3.0  # 代价缩放因子
+        inflation_radius: 0.15  # 膨胀半径(米)
       always_send_full_costmap: True  # 是否始终发送完整代价地图
 
 map_server:  # 地图服务器参数
@@ -254,7 +254,7 @@ planner_server:  # 规划器服务器参数
     planner_plugins: ["GridBased"]  # 规划器插件列表
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"  # 基于导航函数的全局规划器
-      tolerance: 0.5  # 规划容忍度(米)
+      tolerance: 0.6  # 规划容忍度(米)
       use_astar: true  # 是否使用A*算法，false则使用Dijkstra算法
       allow_unknown: false  # 是否允许规划穿过未知区域
 

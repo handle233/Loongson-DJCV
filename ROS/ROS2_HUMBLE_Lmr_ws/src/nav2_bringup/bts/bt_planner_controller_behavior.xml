@@ -42,7 +42,7 @@
           </Sequence>
           <!-- <Spin spin_dist="1.57"/> --> <!-- 旋转动作（已注释，可选） -->
           <!-- Wait：等待5秒 -->
-          <Wait wait_duration="5"/>
+          <Wait wait_duration="1"/>
           <!-- BackUp：后退0.3米，速度0.05米/秒 -->
           <BackUp backup_dist="0.10" backup_speed="0.1"/>
         </RoundRobin>
