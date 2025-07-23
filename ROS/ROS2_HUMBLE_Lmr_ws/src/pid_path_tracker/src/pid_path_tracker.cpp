@@ -23,6 +23,8 @@ void PIDPathTracker::configure(
   clock_ = node->get_clock();
   logger_ = node->get_logger();
 
+  speed_limit_ = 0.095;  // 默认不限制
+
   nav2_util::declare_parameter_if_not_declared(
     node, plugin_name_ + ".lookahead_dist", rclcpp::ParameterValue(0.6));
   node->get_parameter(plugin_name_ + ".lookahead_dist", lookahead_dist_);
@@ -100,6 +102,7 @@ void PIDPathTracker::activate()
   RCLCPP_INFO(logger_, "Activating PIDPathTracker plugin.");
   lookahead_pub_->on_activate();
   local_plan_pub_->on_activate();
+  last_time_ = clock_->now();
 }
 
 void PIDPathTracker::deactivate()
@@ -132,11 +135,22 @@ void PIDPathTracker::setPlan(const nav_msgs::msg::Path & path)
   global_plan_ = path;
 }
 
+void PIDPathTracker::fixGlobalPlanFrameId(const std::string & default_frame_id)
+{
+  for (auto & pose : global_plan_.poses) {
+    if (pose.header.frame_id.empty()) {
+      // RCLCPP_WARN(logger_, "Empty frame_id detected in global_plan, setting to '%s'", default_frame_id.c_str());
+      pose.header.frame_id = default_frame_id;
+    }
+  }
+}
+
 geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
   const geometry_msgs::msg::PoseStamped & pose,
   const geometry_msgs::msg::Twist & /*velocity*/,
   nav2_core::GoalChecker * /*goal_checker*/)
 {
+  fixGlobalPlanFrameId("map");
   auto cmd_vel = std::make_unique<geometry_msgs::msg::TwistStamped>();
   cmd_vel->header.frame_id = costmap_ros_->getBaseFrameID();
   cmd_vel->header.stamp = clock_->now();
@@ -151,10 +165,15 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
   nav_msgs::msg::Path transformed_plan;
   try {
     for (const auto & global_pose : global_plan_.poses) {
+      // if (global_plan_.poses.empty() || global_plan_.poses[0].header.frame_id.empty()) {
+      //   RCLCPP_ERROR(logger_, "Global plan is empty or has no frame_id!");
+      //     return *cmd_vel;
+      //   }
       geometry_msgs::msg::PoseStamped transformed_pose;
       tf_->transform(
-        global_pose, transformed_pose, "map",
+        global_pose, transformed_pose, costmap_ros_->getBaseFrameID(),
         tf2::durationFromSec(transform_tolerance_));
+        
       transformed_plan.poses.push_back(transformed_pose);
     }
   } catch (const tf2::TransformException & ex) {
@@ -166,8 +185,18 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
   // 步骤 2: 搜索下一个目标点 (lookahead point)
   geometry_msgs::msg::PoseStamped target_waypoint;
   bool target_found = false;
+  double angle_error = 0;
   for (const auto & pose_local : transformed_plan.poses) {
     double dist = std::hypot(pose_local.pose.position.x, pose_local.pose.position.y);
+    // double yaw = tf2::getYaw(pose_local.pose.orientation);
+    double angle_to_target = std::atan2(pose_local.pose.position.x, -pose_local.pose.position.y);
+    angle_error = angle_to_target - 3.1415926/2;
+    angle_error = std::atan2(std::sin(angle_error), std::cos(angle_error));
+    printf("pose_local.pose.position.x = %.2f\n",pose_local.pose.position.x);
+    printf("pose_local.pose.position.y = %.2f\n",pose_local.pose.position.y);
+    printf("dist = %.2f\n",dist);
+    printf("angle_to_target = %.2f\n",angle_to_target);
+    printf("angle_error = %.2f\n",angle_error);
     if (dist > lookahead_dist_) {
       target_waypoint = pose_local;
       target_found = true;
@@ -187,9 +216,9 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
   marker.type = visualization_msgs::msg::Marker::SPHERE;
   marker.action = visualization_msgs::msg::Marker::ADD;
   marker.pose = target_waypoint.pose;
-  marker.scale.x = 0.3;
-  marker.scale.y = 0.3;
-  marker.scale.z = 0.3;
+  marker.scale.x = 0.1;
+  marker.scale.y = 0.1;
+  marker.scale.z = 0.1;
   marker.color.a = 1.0;
   marker.color.r = 1.0;
   marker.color.g = 0.0;
@@ -197,50 +226,53 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
   lookahead_pub_->publish(marker);
 
   // 步骤 3: 计算控制值
-  double lateral_error = target_waypoint.pose.position.y;
-  // ** FIX: Use computeCommand for older API **
-  rclcpp::Time now = clock_->now();
-  rclcpp::Duration duration = now - last_time_;
-  double dt_ = duration.seconds();
-  if (dt_ < 1e-6) {
-     dt_ = 1e-3;
-  }
-  last_time_ = now;
+  // double lateral_error = target_waypoint.pose.position.y;
+  // rclcpp::Time now = clock_->now();
+  // rclcpp::Duration duration = now - last_time_;
+  // double dt_ = duration.seconds();
+  // if (dt_ < 1e-6) {
+  //    dt_ = 1e-3;
+  // }
+  // last_time_ = now;
 
-  double angular_velocity = pid_->computeCommand(lateral_error, dt_);
+  // double angular_velocity = pid_->computeCommand(lateral_error, dt_);
+  double pid_kp = 0.8;
+  double angular_velocity = std::clamp(pid_kp * angle_error, -max_angular_vel_, max_angular_vel_);
+  printf("angular_velocity =%.2f\n",angular_velocity);
   // 限制角速度
-  angular_velocity = std::clamp(angular_velocity, -max_angular_vel_, max_angular_vel_);
+  // angular_velocity = std::clamp(angular_velocity, -max_angular_vel_, max_angular_vel_);
 
   // 步骤 4: 安全性 - 碰撞检测
   double linear_velocity = std::min(desired_linear_vel_, speed_limit_);
   
-  // 简单的前向碰撞检测：模拟未来 1.0 秒的轨迹
-  double sim_time = 1.0;
-  int num_steps = 10;
-  double dt = sim_time / num_steps;
-  double current_x = 0.0, current_y = 0.0, current_theta = 0.0;
+  // // 简单的前向碰撞检测：模拟未来 1.0 秒的轨迹
+  // double sim_time = 0.5;
+  // int num_steps = 10;
+  // double dt = sim_time / num_steps;
+  // double current_x = 0.0, current_y = 0.0, current_theta = 0.0;
 
-  for (int i = 0; i < num_steps; ++i) {
-    current_x += linear_velocity * cos(current_theta) * dt;
-    current_y += linear_velocity * sin(current_theta) * dt;
-    current_theta += angular_velocity * dt;
+  // for (int i = 0; i < num_steps; ++i) {
+  //   current_x += linear_velocity * cos(current_theta) * dt;
+  //   current_y += linear_velocity * sin(current_theta) * dt;
+  //   current_theta += angular_velocity * dt;
 
-    unsigned int mx, my;
-    if (!costmap_ros_->getCostmap()->worldToMap(current_x, current_y, mx, my)) {
-      RCLCPP_WARN(logger_, "Projected path is out of costmap bounds. Stopping.");
-      return *cmd_vel; // 零速
-    }
+  //   unsigned int mx, my;
+  //   if (!costmap_ros_->getCostmap()->worldToMap(current_x, current_y, mx, my)) {
+  //     RCLCPP_WARN(logger_, "Projected path is out of costmap bounds. Stopping.");
+  //     // return *cmd_vel; // 零速
+  //   }
 
-    unsigned char cost = costmap_ros_->getCostmap()->getCost(mx, my);
-    if (cost >= nav2_costmap_2d::INSCRIBED_INFLATED_OBSTACLE) {
-      RCLCPP_WARN(logger_, "Collision ahead! Stopping the robot.");
-      return *cmd_vel; // 零速
-    }
-  }
+  //   unsigned char cost = costmap_ros_->getCostmap()->getCost(mx, my);
+  //   if (cost >= nav2_costmap_2d::INSCRIBED_INFLATED_OBSTACLE) {
+  //     RCLCPP_WARN(logger_, "Collision ahead! Stopping the robot.");
+  //     // return *cmd_vel; // 零速
+  //   }
+  // }
 
   // 步骤 5: 发布指令
   cmd_vel->twist.linear.x = linear_velocity;
   cmd_vel->twist.angular.z = angular_velocity;
+  RCLCPP_INFO(logger_, "Velocity: linear=%.2f, angular=%.2f", cmd_vel->twist.linear.x, cmd_vel->twist.angular.z);
 
   return *cmd_vel;
 }

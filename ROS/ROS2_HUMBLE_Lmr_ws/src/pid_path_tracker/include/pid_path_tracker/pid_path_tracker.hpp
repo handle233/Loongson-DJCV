@@ -38,7 +38,7 @@ public:
   void cleanup() override;
   void activate() override;
   void deactivate() override;
-
+  void fixGlobalPlanFrameId(const std::string & default_frame_id);
   geometry_msgs::msg::TwistStamped computeVelocityCommands(
     const geometry_msgs::msg::PoseStamped & pose,
     const geometry_msgs::msg::Twist & velocity,
