@@ -187,6 +187,11 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
   bool target_found = false;
   double angle_error = 0;
   for (const auto & pose_local : transformed_plan.poses) {
+
+    if(pose_local.pose.position.x < 0){
+      continue;
+    }
+
     double dist = std::hypot(pose_local.pose.position.x, pose_local.pose.position.y);
     // double yaw = tf2::getYaw(pose_local.pose.orientation);
     double angle_to_target = std::atan2(pose_local.pose.position.x, -pose_local.pose.position.y);
@@ -216,9 +221,9 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
   marker.type = visualization_msgs::msg::Marker::SPHERE;
   marker.action = visualization_msgs::msg::Marker::ADD;
   marker.pose = target_waypoint.pose;
-  marker.scale.x = 0.1;
-  marker.scale.y = 0.1;
-  marker.scale.z = 0.1;
+  marker.scale.x = 0.05;
+  marker.scale.y = 0.05;
+  marker.scale.z = 0.05;
   marker.color.a = 1.0;
   marker.color.r = 1.0;
   marker.color.g = 0.0;
