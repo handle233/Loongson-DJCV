@@ -9,7 +9,7 @@
       <!-- PipelineSequence：流水线顺序节点，名称为NavigateWithReplanning -->
       <PipelineSequence name="NavigateWithReplanning">
         <!-- RateController：频率控制器，限制内部节点以0.333Hz（约每3秒）运行一次 -->
-        <RateController hz="0.333">
+        <RateController hz="1.0">
           <!-- RecoveryNode：恢复节点，最多重试1次，名称为ComputePathThroughPoses -->
           <RecoveryNode number_of_retries="1" name="ComputePathThroughPoses">
             <!-- ReactiveSequence：反应式顺序节点，依次执行子节点，遇到失败会重新评估 -->

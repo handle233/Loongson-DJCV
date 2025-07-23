@@ -50,7 +50,7 @@ bt_navigator:  # 行为树导航器参数
     global_frame: map  # 全局坐标系
     robot_base_frame: base_link  # 机器人基坐标系
     odom_topic: /odom  # 里程计话题
-    bt_loop_duration: 10  # 行为树循环周期（毫秒）
+    bt_loop_duration: 1  # 行为树循环周期（毫秒）
     default_server_timeout: 20  # 默认服务超时时间（秒）
     wait_for_service_timeout: 1000  # 等待服务超时时间（毫秒）
     # 'default_nav_through_poses_bt_xml' 和 'default_nav_to_pose_bt_xml' 使用默认行为树XML文件
@@ -117,7 +117,7 @@ bt_navigator_navigate_to_pose_rclcpp_node:  # 导航到单个位姿的行为树�
 controller_server:
   ros__parameters:
     use_sim_time: False  # 是否使用仿真时间
-    controller_frequency: 10.0  # 控制器执行频率(Hz)
+    controller_frequency: 20.0  # 控制器执行频率(Hz)
     progress_checker_plugin: "progress_checker"  # 进度检查器插件名称
     controller_plugins: ["FollowPath"] 
 
@@ -125,7 +125,7 @@ controller_server:
     FollowPath:
       plugin: "pid_path_tracker::PIDPathTracker"
       robot_base_frame: base_link
-      lookahead_dist: 0.2
+      lookahead_dist: 0.1
       desired_linear_vel: 0.09
       max_angular_vel: 0.2
       transform_tolerance: 0.5
@@ -162,7 +162,7 @@ local_costmap:  # 局部代价地图配置
       plugins: ["voxel_layer", "inflation_layer"]  # 使用的插件列表
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"  # 膨胀层插件
-        cost_scaling_factor: 0.05 # 代价缩放因子，越小膨胀区域代价越高
+        cost_scaling_factor: 0.03 # 代价缩放因子，越小膨胀区域代价越高
         inflation_radius: 0.15  # 膨胀半径(米)
       voxel_layer:
         plugin: "nav2_costmap_2d::VoxelLayer"  # 体素层插件
@@ -196,8 +196,8 @@ local_costmap:  # 局部代价地图配置
 global_costmap:  # 全局代价地图配置
   global_costmap:
     ros__parameters:
-      update_frequency: 2.0  # 地图更新频率(Hz)
-      publish_frequency: 2.0  # 地图发布频率(Hz)
+      update_frequency: 1.0  # 地图更新频率(Hz)
+      publish_frequency: 1.0  # 地图发布频率(Hz)
       global_frame: map  # 全局坐标系
       robot_base_frame: base_link  # 机器人基坐标系
       use_sim_time: False  # 是否使用仿真时间
@@ -255,7 +255,7 @@ planner_server:  # 规划器服务器参数
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"  # 基于导航函数的全局规划器
       tolerance: 0.5  # 规划容忍度(米)
-      use_astar: true  # 是否使用A*算法，false则使用Dijkstra算法
+      use_astar: false  # 是否使用A*算法，false则使用Dijkstra算法
       allow_unknown: false  # 是否允许规划穿过未知区域
 
 smoother_server:  # 平滑器服务器参数
