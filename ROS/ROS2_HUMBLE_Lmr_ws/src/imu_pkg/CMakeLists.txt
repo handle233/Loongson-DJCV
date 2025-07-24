@@ -13,6 +13,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 include_directories(
   include
 )
@@ -32,8 +33,14 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
-ament_target_dependencies(${PROJECT_NAME} rclcpp sensor_msgs nav_msgs tf2 tf2_ros geometry_msgs)
+ament_target_dependencies(${PROJECT_NAME} rclcpp sensor_msgs nav_msgs tf2 tf2_ros geometry_msgs tf2_geometry_msgs)
 target_link_libraries(${PROJECT_NAME} pthread)
+
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
+)
+
 
 install(TARGETS
   imu_pkg

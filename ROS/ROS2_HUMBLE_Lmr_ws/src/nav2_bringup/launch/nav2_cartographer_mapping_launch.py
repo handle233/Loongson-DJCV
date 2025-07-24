@@ -11,7 +11,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
     # -------- 获取各功能包的路径 --------
-    # 获取SLAM功能包路径（你写的是e05_cartographer_mapping）
+    # 获取SLAM功能包路径
     slam_pkg = get_package_share_directory("e05_cartographer_mapping")
     # 获取Nav2导航功能包路径
     nav2_pkg = get_package_share_directory("e07_nav2_bringup")

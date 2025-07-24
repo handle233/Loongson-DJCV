@@ -1,7 +1,7 @@
 map_server:  # map_server节点的参数配置
   ros__parameters:  # ROS2参数命名空间
     use_sim_time: False  # 是否使用仿真时间（通常用于仿真环境，True为仿真时间，False为系统时间）
-    yaml_filename: "/home/lcyx/ROS2_HUMBLE_Lmr/ROS2_HUMBLE_Lmr_ws/src/e07_nav2_bringup/maps/ros_map.yaml"  # 地图文件的yaml路径，留空表示未指定地图文件
+    yaml_filename: "/home/xiaom/Loongson-DJCV/ROS/ROS2_HUMBLE_Lmr_ws/src/nav2_bringup/maps/success_4.map.yaml"  # 地图文件的yaml路径，留空表示未指定地图文件
 
 map_saver:  # map_saver节点的参数配置
   ros__parameters:  # ROS2参数命名空间

@@ -12,7 +12,7 @@ from nav2_common.launch import RewrittenYaml
 
 def generate_launch_description():
     # 获取导航包的共享目录
-    bringup_dir = get_package_share_directory('e07_nav2_bringup')
+    bringup_dir = get_package_share_directory('nav2_bringup')
 
     # 声明命名空间配置，默认为空字符串
     namespace = LaunchConfiguration('namespace', default='')
@@ -21,7 +21,7 @@ def generate_launch_description():
     # 声明是否自动启动配置，默认为True
     autostart = LaunchConfiguration('autostart', default='true')
     # 声明参数文件配置，默认指向导航包内的参数文件
-    params_file = LaunchConfiguration('params_file', default=os.path.join(bringup_dir, 'params', 'nav2_teb_params.yaml'))#LMR
+    params_file = LaunchConfiguration('params_file', default=os.path.join(bringup_dir, 'params', 'nav2_dwb_params.yaml'))#LMR
     # 声明是否使用组件化启动配置，默认为False
     use_composition = LaunchConfiguration('use_composition', default='False')
     # 声明容器名称配置，默认为'nav2_container'

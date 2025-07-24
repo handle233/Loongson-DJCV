@@ -56,6 +56,6 @@
   <joint name="imu_joint" type="fixed">
       <parent link="base_link" /> <!-- 父链接改为base_link -->
       <child link="imu_link" />
-      <origin xyz="0.02 0 0.01" /> <!-- 位置相对于base_link -->
+      <origin xyz="0 0 0.01" /> <!-- 位置相对于base_link -->
   </joint>
 </robot>

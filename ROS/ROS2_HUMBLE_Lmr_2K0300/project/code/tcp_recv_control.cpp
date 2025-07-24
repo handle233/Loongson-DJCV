@@ -10,19 +10,10 @@ car_control_typedef g_car_control;
 
 static int tcp_client_recv_socket;
 
-// static pthread_mutex_t tcp_recv_control_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-// car_control_typedef get_recv_control()
-// {
-//     car_control_typedef temp_car_control;
+extern ServoController Servo;
+extern MotorController Motor;
 
-//     // pthread_mutex_lock(&tcp_recv_control_mutex);
-//     temp_car_control.speed = car_control.speed;
-//     temp_car_control.servo = car_control.servo;
-//     // pthread_mutex_unlock(&tcp_recv_control_mutex);
-
-//     return temp_car_control;
-// }
 void close_tcp_recv_control(void)
 {
     close(tcp_client_recv_socket);
@@ -39,28 +30,22 @@ void tcp_recv_control_thd_entry(void)
 
     while(1)
     {
-        do
-        {
-            // 初始化 tcp server
+        // 初始化 tcp server
+        do{
             tcp_client_recv_socket = tcp_init(SERVER_IP, RECV_CONTROL_PORT);
-            if(tcp_client_recv_socket < 0)
-            {
+            if(tcp_client_recv_socket < 0){
                 system_delay_ms(1000);
                 printf("tcp_client_recv_socket error \r\n");
-            }
-            else
-            {
+            }else{
                 printf("tcp_client_recv_socket OK \r\n");
             }
-        } while (tcp_client_recv_socket <= 0);
+        }while (tcp_client_recv_socket <= 0);
 
-        while(1)
-        {
+        while(1){
             // TCP周期接收控制数据
             int str_len = tcp_client_read_data(tcp_client_recv_socket, (uint8_t *)&tcp_car_control, sizeof(car_control_typedef));
             
-            if(str_len <= 0)
-            {
+            if(str_len <= 0){
                 tcp_car_control.left_speed = 0;
                 tcp_car_control.right_speed = 0;
                 tcp_car_control.servo_duty = 90;
@@ -70,46 +55,54 @@ void tcp_recv_control_thd_entry(void)
                 tcp_car_control.forward = 0;     // 新增
                 //上面是LCYX的扩展
                 break;
-            }
-            else if(str_len > 0)
-            {
-                long long lasttime = 0;
+            }else if(str_len > 0){
+                //抽样显示
+                static long long lasttime = 0;
                 timeval tv;
                 gettimeofday(&tv,nullptr);
                 long long time = tv.tv_sec*1000000+tv.tv_usec;
 
                 if(time-lasttime > 1000*100){
-                    // printf("left_speed = %d\r\n", tcp_car_control.left_speed);
-                    // printf("right_speed = %d\r\n", tcp_car_control.right_speed);
-                    // printf("servo_duty = %d\r\n", tcp_car_control.servo_duty);
-                    // LCYX的扩展
                     cout << "left_speed = " << tcp_car_control.left_speed << 
                     ", right_speed = " << tcp_car_control.right_speed <<
                     ", servo_duty = " << tcp_car_control.servo_duty << endl;
                     // LCYX的扩展
                     lasttime = time;
                 }
-
-                // 下面是LCYX的扩展
-                //printf("servo_angle = %d\r\n", tcp_car_control.servo_angle); // 新增
-                // printf("speed = %d\r\n", tcp_car_control.speed);             // 新增
-                // printf("forward = %d\r\n", tcp_car_control.forward);         // 新增
-                //usleep(100);
-                //上面是LCYX的扩展
             }
     
-            // pthread_mutex_lock(&tcp_recv_control_mutex);
-            g_car_control.left_speed = tcp_car_control.left_speed * 10.0 / 7.0; // LCYX: 调整速度比例
-            g_car_control.right_speed = tcp_car_control.right_speed * 10.0 / 7.0; // LCYX: 调整速度比例
+            g_car_control.left_speed = tcp_car_control.left_speed; // LCYX: 调整速度比例
+            g_car_control.right_speed = tcp_car_control.right_speed; // LCYX: 调整速度比例
             g_car_control.servo_duty = tcp_car_control.servo_duty;
-            // 下面是LCYX的扩展
-            g_car_control.servo_angle = tcp_car_control.servo_angle; // 新增
-            g_car_control.speed = tcp_car_control.speed;             // 新增
-            g_car_control.forward = tcp_car_control.forward;         // 新增
-            // 上面是LCYX的扩展
-            // pthread_mutex_unlock(&tcp_recv_control_mutex);
+            //判断指定速度是否为0，为0就不更新
+            if(tcp_car_control.forward!=0){
+                g_car_control.forward = tcp_car_control.forward;
+                printf("update%d\n",g_car_control.forward);
+            }else{
+                printf("speed 0 no gengxin\n");
+            }
+            
 
-            // system_delay_ms(10);
+            //设置电机
+            if (g_car_control.servo_duty < 0 ){
+                g_car_control.servo_duty = 0; // 限制舵机角度最小值为0
+            }else if (g_car_control.servo_duty > 180){
+                g_car_control.servo_duty = 180; // 限制舵机角
+            }
+            Servo.setAngle(g_car_control.servo_duty);  // 设置舵机角度
+
+            if(g_car_control.left_speed>=0){
+                Motor.setLeftWheel(g_car_control.left_speed,1);
+            }else{
+                Motor.setLeftWheel(-g_car_control.left_speed,0);
+            }
+            if(g_car_control.right_speed>=0){
+                Motor.setRightWheel(g_car_control.right_speed,1);
+            }else{
+                Motor.setRightWheel(-g_car_control.right_speed,0);
+            }
+            
+            cout<<"left "<<g_car_control.left_speed<<"right "<<g_car_control.right_speed<<endl;
         }
     }
 }

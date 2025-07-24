@@ -1,0 +1,7 @@
+<library path="my_local_control">
+  <class name="my_local_control::MyLocalController"
+         type="my_local_control::MyLocalController"
+         base_class_type="nav2_core::Controller">
+    <description>Simple controller based on naive DWB principle.</description>
+  </class>
+</library>

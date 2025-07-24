@@ -42,11 +42,11 @@ void tcp_send_encoder::get_data_thread()
         double dist = encoder.Get_10ms_dist();
         {
             std::lock_guard<std::mutex> lock(data_mutex_);
-            encoder_distance_10ms_ += flag ? dist : -dist;
-            printf("Encoder distance: %f\n", encoder_distance_10ms_);
+            encoder_distance_10ms_ += flag>0 ? dist : -dist;
+            //printf("Encoder distance: %f\n", encoder_distance_10ms_);
             
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
 
@@ -74,6 +74,6 @@ void tcp_send_encoder::send_data_thread()
             //printf("Encoder data sent: %.2f\n", interg);
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 每 100ms 发送一次
+        // std::this_thread::sleep_for(std::chrono::milliseconds(10)); // 每 10ms 发送一次
     }
 }

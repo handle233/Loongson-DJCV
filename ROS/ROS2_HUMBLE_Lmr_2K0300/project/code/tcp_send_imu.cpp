@@ -11,6 +11,7 @@ tcp_send_imu::tcp_send_imu(const char *port_name)
 {
     net.conn(SERVER_IP, SEND_IMU_PORT);
     open_serial(port_name);
+    encoder.init(); // ³õÊ¼»¯±àÂëÆ÷
 }
 
 tcp_send_imu::~tcp_send_imu()
@@ -67,6 +68,7 @@ void tcp_send_imu::read_thread()
     uint8_t recv_buf[128];
     uint8_t frame_buf[11];
     uint8_t key_ = 0;
+    data_pack data;
 
     while (run_flag)
     {
@@ -80,9 +82,9 @@ void tcp_send_imu::read_thread()
         for (int i = 0; i < n; ++i)
         {
             uint8_t byte = recv_buf[i];
-            frame_buf[key_++] = byte;
+            data.imu_data[key_++] = byte;
 
-            if (frame_buf[0] != 0x55)
+            if (data.imu_data[0] != 0x55)
             {
                 key_ = 0;
                 continue;
@@ -90,15 +92,26 @@ void tcp_send_imu::read_thread()
 
             if (key_ < 11)
                 continue;
+            
+            int flag = g_car_control.forward;
+            double dist = encoder.Get_10ms_dist();
+            static double total_dist = 0;
+            //std::cout<<"forward:"<<g_car_control.forward;
 
+            total_dist += dist;
+            data.encoder_data = flag>0 ? dist : -dist;
+            //std::cout<<"way on board:"<<data.encoder_data<<std::endl;
+            //printf("total distance: %f\n", total_dist);  
             {
                 std::lock_guard<std::mutex> lock(queue_mutex);
-                data_queue.emplace(frame_buf, frame_buf + 11);
+                data_queue.emplace(data);
             }
 
             data_cond.notify_one();
             key_ = 0;
         }
+        
+    
     }
 }
 
@@ -112,11 +125,10 @@ void tcp_send_imu::send_thread()
 
         while (!data_queue.empty())
         {
-            std::vector<uint8_t> frame = data_queue.front();
+            data_pack frame = data_queue.front();
             data_queue.pop();
-
             lock.unlock();
-            net.send(frame.data(), frame.size());
+            net.send(&frame, sizeof(frame));
             lock.lock();
         }
     }

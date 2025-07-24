@@ -24,35 +24,14 @@ TimerFdWrapper *timer;
 ServoController Servo;
 MotorController Motor;
 tcp_send_imu imu(USB_PATH);  // 创建 imu 对象
-tcp_send_encoder encoder; // 创建编码器对象
+//tcp_send_encoder encoder; // 创建编码器对象
 //LCYX
 
 // 定义线程回调函数，用于处理定时器到期事件
 void timer_callback(void) 
 {
     //LCYX
-    if (g_car_control.servo_duty < 0 )
-    {
-        g_car_control.servo_duty = 0; // 限制舵机角度最小值为0
-    }
-    else if (g_car_control.servo_duty > 180)
-    {
-        g_car_control.servo_duty = 180; // 限制舵机角
-        // 最大值为180
-    }
-    Servo.setAngle(g_car_control.servo_duty);  // 设置舵机角度
-    //LCYX
-    if (g_car_control.left_speed > 0 && g_car_control.right_speed > 0) {
-        Motor.setLeftWheel(g_car_control.left_speed, true);
-        Motor.setRightWheel(g_car_control.right_speed, true); // 设置电机前进，速度为g_car_control.left_speed
-    } else if (g_car_control.left_speed < 0 && g_car_control.right_speed < 0) {
-        Motor.setLeftWheel(-g_car_control.left_speed, false);
-        Motor.setRightWheel(-g_car_control.right_speed, false); // 设置电机后
-    } else if (g_car_control.left_speed == 0 ) {
-        Motor.stop(); // 停止电机
-    } else {
-        printf("错误的速度值，无法设置电机速度！\n");
-    }
+    
     // Servo.setAngle(g_car_control.servo_angle);  // 设置舵机角度
     // if (g_car_control.forward) {
     //     Motor.move(g_car_control.speed, true); // 前进
@@ -80,7 +59,7 @@ void cleanup()
     close_tcp_send_ladar();
     close_tcp_recv_control();
     imu.stop();  // 停止IMU数据发送线程
-    encoder.stop(); // 停止编码器数据发送线程
+    // encoder.stop(); // 停止编码器数据发送线程
 
     //LCYX
     Motor.stop();  // 停止电机
@@ -112,7 +91,9 @@ int main(int, char**)
     // TCP接收ROS2的数据，控制车模运动和转向
     ThreadWrapper thd_2(tcp_recv_control_thd_entry);
     imu.start();  // 启动IMU数据发送线程
-    encoder.start(); // 启动编码器数据发送线程
+    // encoder.start(); // 启动编码器数据发送线程
+    SetPWM pwm3(PWM3,33333,18000,PWM_NORMAL);
+    pwm3.Enable();
     while(1)
     {
         system_delay_ms(10);  // 延时10ms   

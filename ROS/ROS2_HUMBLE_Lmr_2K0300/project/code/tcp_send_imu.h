@@ -1,6 +1,7 @@
 #ifndef SERIAL_COMM_H
 #define SERIAL_COMM_H
 
+#include "PZY.hpp"
 #include <queue>
 #include <mutex>
 #include <thread>
@@ -30,14 +31,19 @@ public:
 
 private:
     int serial_fd_;
-    std::queue<std::vector<uint8_t>> data_queue;
+    typedef struct {
+        uint8_t imu_data[11];
+        double encoder_data;
+    }data_pack;
+    std::queue<data_pack> data_queue;
     std::mutex queue_mutex;
     std::condition_variable data_cond;
     std::atomic<bool> run_flag{true};
-
     std::thread t_reader;
     std::thread t_sender;
-
+    // double encoder_distance_10ms_ = 0;
+    Encoder10msDist encoder;
+    
     // ´ò¿ª´®¿Ú
     void open_serial(const char *port_name);
 

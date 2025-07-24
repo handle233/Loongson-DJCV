@@ -10,7 +10,7 @@
       <!-- PipelineSequence：流水线顺序节点，名称为NavigateWithReplanning -->
       <PipelineSequence name="NavigateWithReplanning">
         <!-- RateController：频率控制器，限制内部节点以1Hz运行一次 -->
-        <RateController hz="1.0">
+        <RateController hz="4.0">
           <!-- RecoveryNode：恢复节点，最多重试1次，名称为ComputePathToPose -->
           <RecoveryNode number_of_retries="1" name="ComputePathToPose">
             <!-- ComputePathToPose：根据目标点goal计算路径，输出为path，使用GridBased规划器 -->
@@ -42,9 +42,9 @@
           </Sequence>
           <!-- <Spin spin_dist="1.57"/> --> <!-- 旋转动作（已注释，可选） -->
           <!-- Wait：等待5秒 -->
-          <Wait wait_duration="5"/>
+          <Wait wait_duration="1"/>
           <!-- BackUp：后退0.3米，速度0.05米/秒 -->
-          <BackUp backup_dist="0.30" backup_speed="0.05"/>
+          <BackUp backup_dist="0.10" backup_speed="0.1"/>
         </RoundRobin>
       </ReactiveFallback>
     </RecoveryNode>
