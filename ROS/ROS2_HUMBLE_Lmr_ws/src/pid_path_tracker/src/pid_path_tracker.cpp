@@ -249,7 +249,7 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
   // last_time_ = now;
 
   // double angular_velocity = pid_->computeCommand(lateral_error, dt_);
-  double pid_kp = 0.90;
+  double pid_kp = 0.9;
   double angular_velocity = std::clamp(pid_kp * angle_error, -max_angular_vel_, max_angular_vel_);
   printf("angular_velocity =%.2f\n",angular_velocity);
   // 限制角速度

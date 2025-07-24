@@ -126,9 +126,9 @@ controller_server:
     FollowPath:
       plugin: "pid_path_tracker::PIDPathTracker"
       robot_base_frame: base_link
-      lookahead_dist: 0.2
-      desired_linear_vel: 0.08
-      max_angular_vel: 0.2
+      lookahead_dist: 0.15
+      desired_linear_vel: 0.09
+      max_angular_vel: 1.0
       transform_tolerance: 0.5
       pid:
         kp: 1.0
@@ -159,12 +159,12 @@ local_costmap:  # 局部代价地图配置
       width: 1  # 地图宽度(米)
       height: 1  # 地图高度(米)
       resolution: 0.01  # 地图分辨率(米/像素)
-      robot_radius: 0.15  # 机器人半径(米)
+      robot_radius: 0.25  # 机器人半径(米)
       plugins: ["voxel_layer", "inflation_layer"]  # 使用的插件列表
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"  # 膨胀层插件
-        cost_scaling_factor: 0.3 # 代价缩放因子，越小膨胀区域代价越高
-        inflation_radius: 0.1  # 膨胀半径(米)
+        cost_scaling_factor: 0.5 # 代价缩放因子，越小膨胀区域代价越高
+        inflation_radius: 0.25  # 膨胀半径(米)
       voxel_layer:
         plugin: "nav2_costmap_2d::VoxelLayer"  # 体素层插件
         enabled: True  # 是否启用
@@ -202,7 +202,7 @@ global_costmap:  # 全局代价地图配置
       global_frame: map  # 全局坐标系
       robot_base_frame: base_link  # 机器人基坐标系
       use_sim_time: False  # 是否使用仿真时间
-      robot_radius: 0.12  # 机器人半径(米)
+      robot_radius: 0.15  # 机器人半径(米)
       resolution: 0.02  # 地图分辨率(米/像素)
       track_unknown_space: true  # 是否跟踪未知空间
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]  # 使用的插件列表
@@ -229,8 +229,8 @@ global_costmap:  # 全局代价地图配置
         map_subscribe_transient_local: True  # 使用临时本地订阅模式
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"  # 膨胀层插件
-        cost_scaling_factor: 3.0  # 代价缩放因子
-        inflation_radius: 0.25  # 膨胀半径(米)
+        cost_scaling_factor: 0.4  # 代价缩放因子
+        inflation_radius: 0.3  # 膨胀半径(米)
       always_send_full_costmap: False  # 是否始终发送完整代价地图
 
 map_server:  # 地图服务器参数
@@ -256,8 +256,8 @@ planner_server:  # 规划器服务器参数
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"  # 基于导航函数的全局规划器
       tolerance: 0.2  # 规划容忍度(米)
-      use_astar: false  # 是否使用A*算法，false则使用Dijkstra算法
-      allow_unknown: false  # 是否允许规划穿过未知区域
+      use_astar: true  # 是否使用A*算法，false则使用Dijkstra算法
+      allow_unknown: true  # 是否允许规划穿过未知区域
 
 # planner_server:
 #   ros__parameters:
@@ -267,7 +267,7 @@ planner_server:  # 规划器服务器参数
 #       plugin: "nav2_smac_planner/SmacPlannerHybrid" # In Iron and older versions, "/" was used instead of "::"
 #       downsample_costmap: false           # whether or not to downsample the map
 #       downsampling_factor: 1              # multiplier for the resolution of the costmap layer (e.g. 2 on a 5cm costmap would be 10cm)
-#       tolerance: 0.8                     # dist-to-goal heuristic cost (distance) for valid tolerance endpoints if exact goal cannot be found.
+#       tolerance: 15.0                     # dist-to-goal heuristic cost (distance) for valid tolerance endpoints if exact goal cannot be found.
 #       allow_unknown: true                 # allow traveling in unknown space
 #       max_iterations: -1             # maximum total iterations to search for before failing (in case unreachable), set to -1 to disable
 #       max_on_approach_iterations: 1000    # Maximum number of iterations after within tolerances to continue to try to find exact solution
@@ -278,12 +278,12 @@ planner_server:  # 规划器服务器参数
 #       analytic_expansion_max_length: 3.0  # For Hybrid/Lattice nodes: The maximum length of the analytic expansion to be considered valid to prevent unsafe shortcutting
 #       analytic_expansion_max_cost: 200.0  # The maximum single cost for any part of an analytic expansion to contain and be valid, except when necessary on approach to goal
 #       analytic_expansion_max_cost_override: false  #  Whether or not to override the maximum cost setting if within critical distance to goal (ie probably required)
-#       minimum_turning_radius: 0.15        # minimum turning radius in m of path / vehicle
+#       minimum_turning_radius: 0.18        # minimum turning radius in m of path / vehicle
 #       reverse_penalty: 0.001                # Penalty to apply if motion is reversing, must be => 1
 #       change_penalty: 0.001                # Penalty to apply if motion is changing directions (L to R), must be >= 0
 #       non_straight_penalty: 0.001           # Penalty to apply if motion is non-straight, must be => 1
 #       cost_penalty: 0.001                   # Penalty to apply to higher cost areas when adding into the obstacle map dynamic programming distance expansion heuristic. This drives the robot more towards the center of passages. A value between 1.3 - 3.5 is reasonable.
-#       retrospective_penalty: 0.3
+#       retrospective_penalty: 0.30
 #       lookup_table_size: 20.0             # Size of the dubin/reeds-sheep distance window to cache, in meters.
 #       cache_obstacle_heuristic: false     # Cache the obstacle map dynamic programming distance expansion heuristic between subsequent replannings of the same goal location. Dramatically speeds up replanning performance (40x) if costmap is largely static.
 #       debug_visualizations: false         # For Hybrid nodes: Whether to publish expansions on the /expansions topic as an array of poses (the orientation has no meaning) and the path's footprints on the /planned_footprints topic. WARNING: heavy to compute and to display, for debug only as it degrades the performance.

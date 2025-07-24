@@ -80,7 +80,7 @@ public:
 
         publisher_ = this->create_publisher<sensor_msgs::msg::LaserScan>(topic_name_, 10);
 
-        timer_ = this->create_wall_timer(100ms, std::bind(&LdLidarNode::timer_callback, this));
+        timer_ = this->create_wall_timer(10ms, std::bind(&LdLidarNode::timer_callback, this));
 
         // 启动TCP连接处理线程
         // tcp_thread_ = std::thread(&LdLidarNode::init_tcp_connection, this);
