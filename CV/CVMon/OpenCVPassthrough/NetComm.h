@@ -169,3 +169,20 @@ private:
     ********/
     int reset();
 };
+
+/********
+* 类     UdpComm
+* 作用   提供简单udp连接
+********/
+class UdpComm {
+public:
+    UdpComm();
+
+    int serv(int port);
+    int conn(const char* addr,int port);
+
+    int send(void* pdata, const int& length);
+    int recv(void* pbuf, const int& buflength);
+private:
+    //sockaddr_in 
+};
