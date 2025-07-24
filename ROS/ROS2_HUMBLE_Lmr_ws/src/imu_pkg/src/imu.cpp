@@ -232,7 +232,7 @@ private:
         //求微小位移
         double left_distance = data.encoder_data;
         double increment_s = 2*d*tan(theta); // 右轮计算微小位移增
-        std::cout<<"way receive"<<increment_s<<std::endl;
+        // std::cout<<"way receive"<<increment_s<<std::endl;
 
         double derta = 0.;
         if(abs(theta)>=1e-3){
