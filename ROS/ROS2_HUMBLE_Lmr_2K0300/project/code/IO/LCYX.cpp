@@ -102,7 +102,7 @@ bool check_gpio_available(int gpio_num) {
  * @功能说明：舵机控制类，实现舵机角度控制
  * @使用说明：
  *   - 角度范围：0-180度
- *   - PWM周期：5000000ns (5ms)
+ *   - PWM周期：  ns (5ms)
  *   - 占空比范围：1350000-1550000
  LMRLMRLMRLMRLMRLMRLMRLMRLMRLMRLMRLMRLMRLMRLMRLMRLMRLMRLMRLMRLMRLMR*/
 

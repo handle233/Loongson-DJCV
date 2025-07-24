@@ -92,6 +92,8 @@ int main(int, char**)
     ThreadWrapper thd_2(tcp_recv_control_thd_entry);
     imu.start();  // 启动IMU数据发送线程
     // encoder.start(); // 启动编码器数据发送线程
+    SetPWM pwm3(PWM3,33333,18000,PWM_NORMAL);
+    pwm3.Enable();
     while(1)
     {
         system_delay_ms(10);  // 延时10ms   
