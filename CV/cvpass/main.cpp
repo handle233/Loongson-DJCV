@@ -105,7 +105,7 @@ int main(int argc,char* argv[]){
             //取阈值
             lck.lock();
 
-		    cv::threshold(blur, dst, 95, 255, cv::THRESH_BINARY);
+		    cv::threshold(blur, dst, 80, 255, cv::THRESH_BINARY);
 
             gettimeofday(&tv,nullptr);
             nowtime = tv.tv_sec*1000000+tv.tv_usec;
@@ -116,7 +116,7 @@ int main(int argc,char* argv[]){
             gettimeofday(&tv,nullptr);
             nowtime = tv.tv_sec*1000000+tv.tv_usec;
             cout<<"采样画点时间:"<<nowtime-begintime<<"us"<<endl;
-            judgePark(weight,dpath,path);
+            //judgePark(weight,dpath,path);
             cout<<"to main"<<endl;
             gettimeofday(&tv,nullptr);
             nowtime = tv.tv_sec*1000000+tv.tv_usec;
@@ -222,6 +222,7 @@ void angleprocess(double axis,double& angle, double& pid) {
 
 
 int inbegin=-1, inend=-1, outbegin=-1, outend=-1;
+int findendin=-1,findendout=-1;
 
 static int parkcount = 0;
 
@@ -441,87 +442,8 @@ for (int l = img.rows - 1; l >= 0; l--) {
     weight.resize(Allegate);
 }
 
+void JudgePark(Mat img){
 
-void judgePark(vector<int>& weight,vector<int> &dpath, vector<int>& path) {
-    inbegin=-1,inend=-1,outbegin=-1,outend=-1;
-
-    vector<int>dweight(weight.size()-1);
-
-    for (int i = 1; i < weight.size(); i++) {
-        dweight[i - 1] = weight[i] - weight[i - 1];
-    }
-
-    int find_in=0;//0 not found 1 counting 2 find over
-    int find_out = 0;//0 not found 1 counting 2 findover
-    for (int i = 0; i < dweight.size(); i++) {
-
-        //判定进入
-        if (dweight[i] > 3 && find_in == 0) {
-            find_in = 1;
-            inbegin = i;
-        }
-        if (dweight[i] < -1 && find_in == 1) {
-            find_in = 2;
-            inend = i;
-        }
-        int interweight = 0;
-
-        for (int i = inbegin; i <= inend && find_in == 2; i++) {
-            interweight += dweight[i];
-        }
-
-        if (interweight < 15 && find_in == 2) {
-            find_in = 0;
-            //cout << "累计长度不足车库入口"<<i << endl;
-            //continue;
-        }
-
-        //判定出去
-        if (dweight[i] < -5 && find_out == 0) {
-            find_out = 1;
-            outbegin = i;
-        }
-        if (dweight[i] > -5 && find_out == 1) {
-            find_out = 2;
-            outend = i;
-            interweight = 0;
-        }
-
-        for (int i = outbegin; i <= outend && find_out == 2; i++) {
-            interweight += dweight[i];
-        }
-
-        if (interweight > -10 && find_out == 2) {
-            find_out = 0;
-            //cout << "累计长度不足车库出口" << i << endl;
-        }
-    }
-
-    if (find_in == 2 && find_out == 2 && (outbegin>inend)) {
-        //线性拟合
-        int delta = path[outend] - path[inbegin];
-        double axis = 1. * delta / (1.*(outend - inbegin));
-    
-        for (int a = inbegin; a < outend; a++) {
-            path[a] = path[inbegin] + axis * (a - inbegin);
-        }
-        for (int a = inbegin; a < outend; a++) {
-            dpath[a] = 0;
-        }
-    }
-
-
-    if(find_out==2){
-        cout<<"找到出口！"<<endl;
-        if(outend<50){
-            lck.unlock();
-            parking();
-            //parking();
-            lck.lock();
-            Motor.move(SPEED,1);
-            cout<<"exit judge park"<<endl;
-        }
-    }
 }
 
 
@@ -654,6 +576,9 @@ void first_parking(){
 
     //Motor.move(12,0);
     cout<<"exit parking"<<endl;
+}
+void lastturn(){
+
 }
 
 void parking(){
