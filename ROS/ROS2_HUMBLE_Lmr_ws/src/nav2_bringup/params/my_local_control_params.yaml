@@ -53,6 +53,7 @@ bt_navigator:  # 行为树导航器参数
     bt_loop_duration: 1  # 行为树循环周期（毫秒）
     default_server_timeout: 20  # 默认服务超时时间（秒）
     wait_for_service_timeout: 1000  # 等待服务超时时间（毫秒）
+    allow_replanning: true
     # 'default_nav_through_poses_bt_xml' 和 'default_nav_to_pose_bt_xml' 使用默认行为树XML文件
     # nav2_bt_navigator/navigate_to_pose_w_replanning_and_recovery.xml
     # nav2_bt_navigator/navigate_through_poses_w_replanning_and_recovery.xml
