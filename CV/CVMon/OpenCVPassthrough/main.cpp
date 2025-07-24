@@ -256,6 +256,11 @@ void judgePark( Mat imgshow,int inbegin,int inend,int outbegin,int outend) {
     }
 }
 
+
+void JudgePark(Mat img) {
+
+}
+
 double Kp, Ki, Kd;
 int main() {
 	NetComm client;
@@ -339,6 +344,7 @@ connect:
         dotway(gray,img,path,dpath,weight);
 
         judgePark(img,inbegin,inend,outbegin,outend);
+        JudgePark(img);
 
         double axisp;
         //lineprocess(path, dpath, axisp);

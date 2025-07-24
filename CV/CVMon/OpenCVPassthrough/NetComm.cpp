@@ -79,6 +79,7 @@ int NetComm::dispach(int maxwait)
     return 0;
 }
 
+//connect
 int NetComm::conn(const char* ipaddr, int port)
 {
     //排除已进入角色状态
@@ -174,7 +175,6 @@ int NetComm::sendpack(void* pdata, const int& length) {
 
     return 0;
 }
-
 int NetComm::recvpacklength()
 {
     //排除非法套接字
@@ -282,3 +282,4 @@ int NetComm::reset()
     SOCK_INFO("Active connection reset.");
     return 0;
 }
+
