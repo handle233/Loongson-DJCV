@@ -92,16 +92,20 @@ def generate_launch_description():
             arguments=['--ros-args', '--log-level', log_level],
             remappings=remappings
         ),
-        Node(
-            package='nav2_bt_navigator',
-            executable='bt_navigator',
-            output='screen',
-            respawn=use_respawn,
-            respawn_delay=2.0,
-            parameters=[configured_params],
-            arguments=['--ros-args', '--log-level', log_level],
-            remappings=remappings
-        ),
+         Node(
+                package='nav2_bt_navigator',
+                executable='bt_navigator',
+                name='bt_navigator',
+                output='screen',
+                respawn=use_respawn,
+                respawn_delay=2.0,
+                parameters=[configured_params,
+                            {"default_nav_to_pose_bt_xml": os.path.join(bringup_dir,"bts","bt_planner_controller_behavior.xml")},
+                            {"default_nav_through_poses_bt_xml": os.path.join(bringup_dir,"bts","bt_planner_controller_behavior_poses.xml")}
+                            ],
+                arguments=['--ros-args', '--log-level', log_level],
+                remappings=remappings
+         ),
         Node(
             package='nav2_waypoint_follower',
             executable='waypoint_follower',

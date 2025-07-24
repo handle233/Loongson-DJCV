@@ -88,7 +88,7 @@ TRAJECTORY_BUILDER_2D = {
     num_range_data = 90,
     grid_options_2d = {
       grid_type = "PROBABILITY_GRID",
-      resolution = 0.01,
+      resolution = 0.04,
     },
     range_data_inserter = {
       range_data_inserter_type = "PROBABILITY_GRID_INSERTER_2D",
