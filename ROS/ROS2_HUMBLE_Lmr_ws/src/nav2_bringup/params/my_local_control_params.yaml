@@ -50,7 +50,7 @@ bt_navigator:  # 行为树导航器参数
     global_frame: map  # 全局坐标系
     robot_base_frame: base_link  # 机器人基坐标系
     odom_topic: /odom  # 里程计话题
-    bt_loop_duration: 1  # 行为树循环周期（毫秒）
+    bt_loop_duration: 100  # 行为树循环周期（毫秒）
     default_server_timeout: 20  # 默认服务超时时间（秒）
     wait_for_service_timeout: 1000  # 等待服务超时时间（毫秒）
     allow_replanning: true
@@ -118,7 +118,7 @@ bt_navigator_navigate_to_pose_rclcpp_node:  # 导航到单个位姿的行为树�
 controller_server:
   ros__parameters:
     use_sim_time: False  # 是否使用仿真时间
-    controller_frequency: 20.0  # 控制器执行频率(Hz)
+    controller_frequency: 10.0  # 控制器执行频率(Hz)
     progress_checker_plugin: "progress_checker"  # 进度检查器插件名称
     controller_plugins: ["FollowPath"] 
 
@@ -142,8 +142,8 @@ controller_server:
       movement_time_allowance: 3.0  # 允许的最大移动时间(秒)
     general_goal_checker:
       plugin: "nav2_controller::SimpleGoalChecker"  # 简单目标检查器插件
-      xy_goal_tolerance: 0.05  # XY平面目标位置容忍度(米)
-      yaw_goal_tolerance: 0.05  # 偏航角目标容忍度(弧度)
+      xy_goal_tolerance: 0.15  # XY平面目标位置容忍度(米)
+      yaw_goal_tolerance: 0.52  # 偏航角目标容忍度(弧度)
       stateful: True  # 是否保持状态
 
 
@@ -151,15 +151,15 @@ local_costmap:  # 局部代价地图配置
   local_costmap:
     ros__parameters:
       update_frequency: 5.0  # 地图更新频率(Hz)
-      publish_frequency: 3.0  # 地图发布频率(Hz)
+      publish_frequency: 5.0  # 地图发布频率(Hz)
       global_frame: odom  # 全局坐标系
       robot_base_frame: base_link  # 机器人基坐标系
       use_sim_time: False  # 是否使用仿真时间
       rolling_window: true  # 是否使用滚动窗口模式
-      width: 1  # 地图宽度(米)
-      height: 1  # 地图高度(米)
-      resolution: 0.02  # 地图分辨率(米/像素)
-      robot_radius: 0.1  # 机器人半径(米)
+      width: 2  # 地图宽度(米)
+      height: 2  # 地图高度(米)
+      resolution: 0.01  # 地图分辨率(米/像素)
+      robot_radius: 0.15  # 机器人半径(米)
       plugins: ["voxel_layer", "inflation_layer"]  # 使用的插件列表
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"  # 膨胀层插件
@@ -250,12 +250,12 @@ map_saver:  # 地图保存器参数
 
 planner_server:  # 规划器服务器参数
   ros__parameters:
-    expected_planner_frequency: 20.0  # 期望的规划频率(Hz)
+    expected_planner_frequency: 10.0  # 期望的规划频率(Hz)
     use_sim_time: False  # 是否使用仿真时间
     planner_plugins: ["GridBased"]  # 规划器插件列表
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"  # 基于导航函数的全局规划器
-      tolerance: 0.5  # 规划容忍度(米)
+      tolerance: 0.2  # 规划容忍度(米)
       use_astar: false  # 是否使用A*算法，false则使用Dijkstra算法
       allow_unknown: false  # 是否允许规划穿过未知区域
 

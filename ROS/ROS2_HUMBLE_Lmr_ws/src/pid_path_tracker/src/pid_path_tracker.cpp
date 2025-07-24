@@ -186,16 +186,22 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
   geometry_msgs::msg::PoseStamped target_waypoint;
   bool target_found = false;
   double angle_error = 0;
+
   for (const auto & pose_local : transformed_plan.poses) {
 
-    if(pose_local.pose.position.x < 0){
-      continue;
-    }
+    //std::cout<<"point: "<<pose_local.pose.position.x<<" "<<pose_local.pose.position.y<<std::endl;
 
     double dist = std::hypot(pose_local.pose.position.x, pose_local.pose.position.y);
+
     // double yaw = tf2::getYaw(pose_local.pose.orientation);
     double angle_to_target = std::atan2(pose_local.pose.position.x, -pose_local.pose.position.y);
     angle_error = angle_to_target - 3.1415926/2;
+
+    if(abs(angle_error)>3.1415926*2./3.){
+      //std::cout<<"target behind the car"<<std::endl;
+      continue;
+    }
+
     angle_error = std::atan2(std::sin(angle_error), std::cos(angle_error));
     printf("pose_local.pose.position.x = %.2f\n",pose_local.pose.position.x);
     printf("pose_local.pose.position.y = %.2f\n",pose_local.pose.position.y);
@@ -209,7 +215,9 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
     }
   }
   if (!target_found) {
-    target_waypoint = transformed_plan.poses.back();
+    std::cout<<"target mismatch"<<std::endl;
+    return *cmd_vel; // 返回零速指令
+    //target_waypoint = transformed_plan.poses.back();
   }
 
   // 可视化 lookahead point
@@ -241,7 +249,7 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
   // last_time_ = now;
 
   // double angular_velocity = pid_->computeCommand(lateral_error, dt_);
-  double pid_kp = 0.85;
+  double pid_kp = 0.90;
   double angular_velocity = std::clamp(pid_kp * angle_error, -max_angular_vel_, max_angular_vel_);
   printf("angular_velocity =%.2f\n",angular_velocity);
   // 限制角速度
