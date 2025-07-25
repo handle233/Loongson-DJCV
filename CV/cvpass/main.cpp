@@ -19,7 +19,7 @@ using namespace cv;
 
 #define WIDTH 640
 #define HEIGHT 330
-#define SPEED 18
+#define SPEED 20
 
 void dotway(cv::Mat img, vector<int>& diff, vector<int>& redline, vector<int>& weight);
 
@@ -28,7 +28,8 @@ void camthread(Mat *pPict);
 void lineprocess(vector<int> &path,vector<int> &dpath,double &axis);
 void angleprocess(double axis,double& angle, double& pid);
 
-void judgePark(vector<int>& weight, vector<int> &dpath, vector<int>& path);
+void JudgePark(Mat gray);
+void judgeparkfixline(vector<int>& weight,vector<int> &dpath, vector<int>& path);
 
 void parking();
 
@@ -70,6 +71,8 @@ int main(int argc,char* argv[]){
         
         cam >> img;
 
+        imwrite("scan.jpg",img);
+
         cv::Mat gray;
 
         timeval tv;
@@ -82,7 +85,7 @@ int main(int argc,char* argv[]){
 
             gettimeofday(&tv,nullptr);
             nowtime = tv.tv_sec*1000000+tv.tv_usec;
-            cout<<"获取图像时间:"<<nowtime-begintime<<"us"<<endl;
+            //cout<<"获取图像时间:"<<nowtime-begintime<<"us"<<endl;
 
             //设置ROI
             Rect ROI(0,0,640,330);
@@ -97,7 +100,7 @@ int main(int argc,char* argv[]){
 
             gettimeofday(&tv,nullptr);
             nowtime = tv.tv_sec*1000000+tv.tv_usec;
-            cout<<"灰度处理时间:"<<nowtime-begintime<<"us"<<endl;
+            //cout<<"灰度处理时间:"<<nowtime-begintime<<"us"<<endl;
 
             //模糊
 		    cv::Mat blur;
@@ -105,44 +108,45 @@ int main(int argc,char* argv[]){
             //取阈值
             lck.lock();
 
-		    cv::threshold(blur, dst, 80, 255, cv::THRESH_BINARY);
+		    cv::threshold(blur, dst, 130, 255, cv::THRESH_BINARY);
 
             gettimeofday(&tv,nullptr);
             nowtime = tv.tv_sec*1000000+tv.tv_usec;
-            cout<<"模糊取阈时间:"<<nowtime-begintime<<"us"<<endl;
+            //cout<<"模糊取阈时间:"<<nowtime-begintime<<"us"<<endl;
             
             vector<int> path,dpath,weight;
             dotway(dst,path,dpath,weight);
             gettimeofday(&tv,nullptr);
             nowtime = tv.tv_sec*1000000+tv.tv_usec;
-            cout<<"采样画点时间:"<<nowtime-begintime<<"us"<<endl;
-            //judgePark(weight,dpath,path);
-            cout<<"to main"<<endl;
+            //cout<<"采样画点时间:"<<nowtime-begintime<<"us"<<endl;
+            judgeparkfixline(weight,dpath,path);
+            JudgePark(dst);
+            //cout<<"to main"<<endl;
             gettimeofday(&tv,nullptr);
             nowtime = tv.tv_sec*1000000+tv.tv_usec;
-            cout<<"寻找车库时间:"<<nowtime-begintime<<"us"<<endl;
+            //cout<<"寻找车库时间:"<<nowtime-begintime<<"us"<<endl;
             readyflag = 1;
             lineprocess(path, dpath, axis);
             double angle;
             angleprocess(axis, angle, pid);
             gettimeofday(&tv,nullptr);
             nowtime = tv.tv_sec*1000000+tv.tv_usec;
-            cout<<"计算角度时间:"<<nowtime-begintime<<"us"<<endl;
+            //cout<<"计算角度时间:"<<nowtime-begintime<<"us"<<endl;
             
 
             roll.setAngle(angle);
-            cout<<"角度："<<angle<<endl;
+            //cout<<"角度："<<angle<<endl;
             gettimeofday(&tv,nullptr);
             nowtime = tv.tv_sec*1000000+tv.tv_usec;
-            cout<<"总共花费时间:"<<nowtime-begintime<<"us"<<endl;
+            //cout<<"总共花费时间:"<<nowtime-begintime<<"us"<<endl;
 
             lck.unlock();
             int deltatime = (1000000/60)-(nowtime-begintime);
             if(deltatime<0){
-                cout<<"主函时间不够"<<endl;
+                //cout<<"主函时间不够"<<endl;
                 deltatime=0;
             }
-            cout<<endl;
+            //cout<<endl;
             usleep(deltatime);
             //printf("\033[H\033[J");
         }
@@ -181,7 +185,7 @@ void lineprocess(vector<int> &path,vector<int> &dpath, double& axis){
                 drightseq[a] = a;
             }
         if(a>dpath.size()/3){
-                drightsum += (dpath.size() / 3 - (a - dpath.size() / 3) / 2)+0.65;
+                drightsum += (dpath.size() / 3 - (a - dpath.size() / 3) / 2);
                 drightseq[a] = (dpath.size() / 3 - (a - dpath.size() / 3) / 2);
             }
         }
@@ -266,7 +270,7 @@ void camthread(Mat *pPict){
 
             gettimeofday(&tv,nullptr);
             nowtime = tv.tv_sec*1000000+tv.tv_usec;
-            cout<<"主函同步时间:"<<nowtime-begintime<<"us"<<endl;
+            //cout<<"主函同步时间:"<<nowtime-begintime<<"us"<<endl;
 
             Server.sendpack(&pathcore,8);
             Server.sendpack(&dpathcore,8);
@@ -306,11 +310,11 @@ void camthread(Mat *pPict){
             delete[] jpgbuf;
             gettimeofday(&tv,nullptr);
             nowtime = tv.tv_sec*1000000+tv.tv_usec;
-            int deltatime = 1000000/16-(nowtime-begintime);
-            cout<<"图传剩余时间:"<<deltatime<<"us"<<endl;
+            int deltatime = 1000000/12-(nowtime-begintime);
+            //cout<<"图传剩余时间:"<<deltatime<<"us"<<endl;
             if(deltatime<0){
                 deltatime=0;
-                cout<<"剩余时间不够"<<endl;
+                //cout<<"剩余时间不够"<<endl;
             }
             usleep(deltatime);
         }
@@ -442,10 +446,157 @@ for (int l = img.rows - 1; l >= 0; l--) {
     weight.resize(Allegate);
 }
 
-void JudgePark(Mat img){
+void JudgePark(Mat gray){
+    vector<int> vertical(gray.cols);
+    vector<int> dvertical(gray.cols-1);
 
+    vector<int> vertbuf(gray.rows);
+
+    for (int r = 0; r < gray.cols; r++) {
+        for (int l = 0; l < gray.rows; l++) {
+            vertbuf[l] = gray.at<uchar>(gray.rows - 1 - l, r);
+        }
+
+        vertical[r] = gray.rows - 1;
+        for (int a = 0; a < gray.rows; a++) {
+            if (vertbuf[a] == 0) {
+                vertical[r] = a;
+                break;
+            }
+        }
+    }
+
+    for (int r = 0; r < gray.cols - 1; r++) {
+        dvertical[r] = vertical[r] - vertical[r + 1];
+    }
+
+    //判断终点
+    int leftendstart=-1,leftendend =-1;
+    for (int col = 0; col < gray.cols; col++) {
+        if(dvertical[col]<0 && leftendstart < 0){
+            leftendstart = col;
+        }
+        if(dvertical[col]>0 && leftendstart>=0){
+            leftendend = col;
+            break;
+        }
+    }
+    leftendend = gray.cols/2;
+    if(leftendend>0){
+        int y = vertical[leftendend]-vertical[leftendstart];
+        int x = leftendend-leftendstart;
+        double k = (1.*y)/(1.*x);
+            static int count = 0;
+        if(k <0.7 && k> 0.5){
+            count++;
+            cout<<"arrive"<<endl;
+        cout<<"begin "<<leftendstart<<"end "<<leftendend<<endl;
+        cout<<" valbegin "<<vertical[leftendstart]<<" valend "<<vertical[leftendend]<<endl;
+        cout<<"k"<<k<<endl;
+        if(count>1){
+            //Motor.stop();
+            //roll.setAngle(180);
+            //exit(0);
+        }
+        }
+    }
+
+
+    //判断车库
+    int startway = 0;
+    int intergstartway = 0;
+    for (int col = gray.cols - 2; col > gray.cols / 2; col--) {
+        intergstartway += dvertical[col];
+        if (intergstartway > 10) {
+            startway = col;
+            break;
+        }
+    }
+
+    double rightstraightaver = 0,dvertaver = 0;
+    for (int col = gray.cols - 1; col > startway; col--) {
+        rightstraightaver += vertical[col];
+        dvertaver += abs(dvertical[col]);
+    }
+    rightstraightaver = rightstraightaver / (gray.cols - startway);
+    dvertaver = dvertaver / (gray.cols - startway);
+
+    if (rightstraightaver > 20 && rightstraightaver < 60 && startway< 640-20 && dvertaver < 20) {
+        cout<<"startway"<<startway<<" dvertaver"<<dvertaver<<" ";
+        cout << "parking" << endl;
+        imwrite("park.jpg",gray);
+        parking();
+    }
 }
 
+void judgeparkfixline(vector<int>& weight,vector<int> &dpath, vector<int>& path){
+    inbegin=-1,inend=-1,outbegin=-1,outend=-1;
+
+    vector<int>dweight(weight.size()-1);
+
+    for (int i = 1; i < weight.size(); i++) {
+        dweight[i - 1] = weight[i] - weight[i - 1];
+    }
+
+    int find_in=0;//0 not found 1 counting 2 find over
+    int find_out = 0;//0 not found 1 counting 2 findover
+    for (int i = 0; i < dweight.size(); i++) {
+
+        //判定进入
+        if (dweight[i] > 3 && find_in == 0) {
+            find_in = 1;
+            inbegin = i;
+        }
+        if (dweight[i] < -1 && find_in == 1) {
+            find_in = 2;
+            inend = i;
+        }
+        int interweight = 0;
+
+        for (int i = inbegin; i <= inend && find_in == 2; i++) {
+            interweight += dweight[i];
+        }
+
+        if (interweight < 15 && find_in == 2) {
+            find_in = 0;
+            //cout << "累计长度不足车库入口"<<i << endl;
+            //continue;
+        }
+
+        //判定出去
+        if (dweight[i] < -5 && find_out == 0) {
+            find_out = 1;
+            outbegin = i;
+        }
+        if (dweight[i] > -5 && find_out == 1) {
+            find_out = 2;
+            outend = i;
+            interweight = 0;
+        }
+
+        for (int i = outbegin; i <= outend && find_out == 2; i++) {
+            interweight += dweight[i];
+        }
+
+        if (interweight > -10 && find_out == 2) {
+            find_out = 0;
+            //cout << "累计长度不足车库出口" << i << endl;
+        }
+    }
+
+    if (find_in == 2 && find_out == 2 && (outbegin>inend)) {
+        //线性拟合
+        int delta = path[outend] - path[inbegin];
+        double axis = 1. * delta / (1.*(outend - inbegin));
+    
+        for (int a = inbegin; a < outend; a++) {
+            path[a] = path[inbegin] + axis * (a - inbegin);
+        }
+        for (int a = inbegin; a < outend; a++) {
+            dpath[a] = 0;
+        }
+    }
+}
 
 void handparking(){
     Encoder10msDist Encoder;
@@ -460,20 +611,21 @@ void handparking(){
         usleep(1000*200);
     }
 }
+#define PARK_SPEED 17
 void second_parking(){
     double interg = 0.;
     Encoder10msDist Encoder;
     Encoder.init();
     roll.setAngle(90);
-    Motor.move(12,1);
+    Motor.move(PARK_SPEED,1);
     
-    while(interg < 0.10){
+    while(interg < 0.30){
         interg += Encoder.Get_10ms_dist();
     }
     interg = 0;
 
     roll.setAngle(0);
-    Motor.move(12,0);
+    Motor.move(PARK_SPEED,0);
 
     while(interg < 0.20){
         interg += Encoder.Get_10ms_dist();
@@ -481,7 +633,7 @@ void second_parking(){
     interg = 0;
 
     roll.setAngle(90);
-    Motor.move(12,0);
+    Motor.move(PARK_SPEED,0);
 
     while(interg < 0.25){
         interg += Encoder.Get_10ms_dist();
@@ -489,7 +641,7 @@ void second_parking(){
     interg = 0;
 
     roll.setAngle(180);
-    Motor.move(12,0);
+    Motor.move(PARK_SPEED,0);
 
     while(interg < 0.15){
         interg += Encoder.Get_10ms_dist();
@@ -497,7 +649,7 @@ void second_parking(){
     interg = 0;
     //入库出库
     roll.setAngle(180);
-    Motor.move(12,1);
+    Motor.move(PARK_SPEED,1);
 
     while(interg < 0.15){
         interg += Encoder.Get_10ms_dist();
@@ -505,7 +657,7 @@ void second_parking(){
     interg = 0;
 
     roll.setAngle(90);
-    Motor.move(12,1);
+    Motor.move(PARK_SPEED,1);
 
     while(interg < 0.07){
         interg += Encoder.Get_10ms_dist();
@@ -513,7 +665,7 @@ void second_parking(){
     interg = 0;
     
     roll.setAngle(0);
-    Motor.move(12,1);
+    Motor.move(PARK_SPEED,1);
 
     while(interg < 0.15){
         interg += Encoder.Get_10ms_dist();
@@ -529,12 +681,12 @@ void first_parking(){
     Encoder10msDist Encoder;
     Encoder.init();
 
-    Motor.move(12,0);
-    while(interg < 0.1){
+    Motor.move(PARK_SPEED,0);
+    while(interg < 0.35){
         interg += Encoder.Get_10ms_dist();
     }
     interg = 0;
-    Motor.move(12,0);
+    Motor.move(PARK_SPEED,0);
 
     roll.setAngle(0);
 
@@ -552,9 +704,9 @@ void first_parking(){
         interg += Encoder.Get_10ms_dist();
     }
     Motor.move(0,0);
-    sleep(5);
+    sleep(1);
 
-    Motor.move(12,1);//前进
+    Motor.move(PARK_SPEED,1);//前进
 
     interg = 0;
 
