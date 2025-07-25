@@ -23,7 +23,7 @@ void PIDPathTracker::configure(
   clock_ = node->get_clock();
   logger_ = node->get_logger();
 
-  speed_limit_ = 0.095;  // 默认不限制
+  speed_limit_ = 2.0;  // 默认不限制
 
   nav2_util::declare_parameter_if_not_declared(
     node, plugin_name_ + ".lookahead_dist", rclcpp::ParameterValue(0.6));
@@ -249,7 +249,7 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
   // last_time_ = now;
 
   // double angular_velocity = pid_->computeCommand(lateral_error, dt_);
-  double pid_kp = 0.9;
+  double pid_kp = 0.8;
   double angular_velocity = std::clamp(pid_kp * angle_error, -max_angular_vel_, max_angular_vel_);
   printf("angular_velocity =%.2f\n",angular_velocity);
   // 限制角速度

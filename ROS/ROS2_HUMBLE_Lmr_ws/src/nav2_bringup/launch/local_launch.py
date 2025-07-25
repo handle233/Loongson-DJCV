@@ -80,7 +80,7 @@ def generate_launch_description():
 
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        default_value=os.path.join(nav2_dir, "maps", 'xianchang.map.yaml'),  # 默认地图路径
+        default_value=os.path.join(nav2_dir, "maps", 'final.map.yaml'),  # 默认地图路径
         description='地图yaml文件的完整路径')
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(

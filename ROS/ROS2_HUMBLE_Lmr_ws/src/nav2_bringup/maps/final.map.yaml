@@ -1,4 +1,4 @@
-image: final.map.pgm
+image: final.map.png
 mode: trinary
 resolution: 0.05
 origin: [-5.64, -5.4, 0]

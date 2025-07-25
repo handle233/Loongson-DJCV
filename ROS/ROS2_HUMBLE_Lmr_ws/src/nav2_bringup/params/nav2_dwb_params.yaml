@@ -127,7 +127,7 @@ controller_server:
       plugin: "pid_path_tracker::PIDPathTracker"
       robot_base_frame: base_link
       lookahead_dist: 0.15
-      desired_linear_vel: 0.10
+      desired_linear_vel: 0.11
       max_angular_vel: 1.0
       transform_tolerance: 0.5
       pid:
@@ -317,7 +317,7 @@ planner_server:
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"
       tolerance: 0.5
-      use_astar: false
+      use_astar: true
       allow_unknown: true
 
 # planner_server:
