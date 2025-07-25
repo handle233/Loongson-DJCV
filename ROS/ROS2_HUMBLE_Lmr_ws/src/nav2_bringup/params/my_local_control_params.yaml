@@ -127,7 +127,7 @@ controller_server:
       plugin: "pid_path_tracker::PIDPathTracker"
       robot_base_frame: base_link
       lookahead_dist: 0.15
-      desired_linear_vel: 0.10
+      desired_linear_vel: 0.15
       max_angular_vel: 1.0
       transform_tolerance: 0.5
       pid:
@@ -159,7 +159,7 @@ local_costmap:  # 局部代价地图配置
       width: 1  # 地图宽度(米)
       height: 1  # 地图高度(米)
       resolution: 0.01  # 地图分辨率(米/像素)
-      robot_radius: 0.25  # 机器人半径(米)
+      robot_radius : 0.15        # 机器人半径(米)
       plugins: ["voxel_layer", "inflation_layer"]  # 使用的插件列表
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"  # 膨胀层插件
@@ -230,7 +230,7 @@ global_costmap:  # 全局代价地图配置
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"  # 膨胀层插件
         cost_scaling_factor: 0.6  # 代价缩放因子
-        inflation_radius: 0.25  # 膨胀半径(米)
+        inflation_radius: 0.15  # 膨胀半径(米)
       always_send_full_costmap: False  # 是否始终发送完整代价地图
 
 map_server:  # 地图服务器参数
@@ -255,7 +255,7 @@ planner_server:  # 规划器服务器参数
     planner_plugins: ["GridBased"]  # 规划器插件列表
     GridBased:
       plugin: "nav2_navfn_planner/NavfnPlanner"  # 基于导航函数的全局规划器
-      tolerance: 0.2  # 规划容忍度(米)
+      tolerance: 0.3 # 规划容忍度(米)
       use_astar: true  # 是否使用A*算法，false则使用Dijkstra算法
       allow_unknown: true  # 是否允许规划穿过未知区域
 

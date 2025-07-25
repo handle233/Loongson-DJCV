@@ -71,7 +71,7 @@ int main(int argc,char* argv[]){
         
         cam >> img;
 
-        imwrite("scan.jpg",img);
+        //imwrite("scan.jpg",img);
 
         cv::Mat gray;
 
@@ -203,7 +203,7 @@ void lineprocess(vector<int> &path,vector<int> &dpath, double& axis){
     }
 
 
-    pathcore = ((1. * pathsum) / rightsum / 100) * 1.*k1/1000.;
+    pathcore = ((1. * pathsum) / rightsum / 100) * 1.*k1/1000.+0.015;
     dpathcore = ((1. * dpathsum) / drightsum) * 1.*k2/1000.;
     axis = (pathcore  + dpathcore);//0.2
 }
@@ -521,10 +521,10 @@ void JudgePark(Mat gray){
     rightstraightaver = rightstraightaver / (gray.cols - startway);
     dvertaver = dvertaver / (gray.cols - startway);
 
-    if (rightstraightaver > 20 && rightstraightaver < 60 && startway< 640-20 && dvertaver < 20) {
+    if (rightstraightaver > 20 && rightstraightaver < 60 && startway< 640-20 && dvertaver < 30) {
         cout<<"startway"<<startway<<" dvertaver"<<dvertaver<<" ";
         cout << "parking" << endl;
-        imwrite("park.jpg",gray);
+        //imwrite("park.jpg",gray);
         parking();
     }
 }
@@ -609,6 +609,7 @@ void handparking(){
         dist += Encoder.Get_10ms_dist();
         cout<<"dist:"<<dist<<endl;
         usleep(1000*200);
+
     }
 }
 #define PARK_SPEED 17
@@ -619,7 +620,7 @@ void second_parking(){
     roll.setAngle(90);
     Motor.move(PARK_SPEED,1);
     
-    while(interg < 0.30){
+    while(interg < 0.10){
         interg += Encoder.Get_10ms_dist();
     }
     interg = 0;
@@ -627,7 +628,7 @@ void second_parking(){
     roll.setAngle(0);
     Motor.move(PARK_SPEED,0);
 
-    while(interg < 0.20){
+    while(interg < 0.23){
         interg += Encoder.Get_10ms_dist();
     }
     interg = 0;
@@ -635,7 +636,7 @@ void second_parking(){
     roll.setAngle(90);
     Motor.move(PARK_SPEED,0);
 
-    while(interg < 0.25){
+    while(interg < 0.14){
         interg += Encoder.Get_10ms_dist();
     }
     interg = 0;
@@ -643,7 +644,7 @@ void second_parking(){
     roll.setAngle(180);
     Motor.move(PARK_SPEED,0);
 
-    while(interg < 0.15){
+    while(interg < 0.11){
         interg += Encoder.Get_10ms_dist();
     }
     interg = 0;
@@ -651,7 +652,7 @@ void second_parking(){
     roll.setAngle(180);
     Motor.move(PARK_SPEED,1);
 
-    while(interg < 0.15){
+    while(interg < 0.09){
         interg += Encoder.Get_10ms_dist();
     }
     interg = 0;
@@ -667,32 +668,42 @@ void second_parking(){
     roll.setAngle(0);
     Motor.move(PARK_SPEED,1);
 
-    while(interg < 0.15){
+    while(interg < 0.25){
         interg += Encoder.Get_10ms_dist();
     }
     interg = 0;
 
 
-    Motor.move(15,1);//前进
-    usleep(1000*300);
+    Motor.move(PARK_SPEED+3,1);//前进
+    usleep(1000*400);
 }
 void first_parking(){
     double interg = 0.;
     Encoder10msDist Encoder;
     Encoder.init();
-
-    Motor.move(PARK_SPEED,0);
-    while(interg < 0.35){
+    //前进一点免得倒的太后
+    Motor.move(PARK_SPEED,1);
+    while(interg < 0.05){
+        
         interg += Encoder.Get_10ms_dist();
     }
+    //退
     interg = 0;
     Motor.move(PARK_SPEED,0);
+
+    roll.setAngle(90);
+
+    interg = 0;
+
+    while(interg < 0.07){
+        interg += Encoder.Get_10ms_dist();
+    }
 
     roll.setAngle(0);
 
     interg = 0;
 
-    while(interg < 0.40){
+    while(interg < 0.48){
         interg += Encoder.Get_10ms_dist();
     }
 
@@ -700,17 +711,19 @@ void first_parking(){
 
     interg = 0;
 
-    while(interg < 0.20){
+    while(interg < 0.16){
         interg += Encoder.Get_10ms_dist();
     }
     Motor.move(0,0);
+
+    //完成入库，现在出库
     sleep(1);
 
     Motor.move(PARK_SPEED,1);//前进
 
     interg = 0;
 
-    while(interg < 0.20){
+    while(interg < 0.15){
         interg += Encoder.Get_10ms_dist();
     }
 
@@ -723,7 +736,7 @@ void first_parking(){
     }
     roll.setAngle(90);
 
-    Motor.move(15,1);//前进
+    Motor.move(PARK_SPEED,1);//前进
     usleep(1000*500);
 
     //Motor.move(12,0);
