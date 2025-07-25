@@ -253,6 +253,8 @@ void camthread(Mat *pPict){
 
         endloop = 1;
 
+        first_parking();//开局出库
+
         Motor.move(SPEED,true);
 
     
@@ -681,43 +683,43 @@ void first_parking(){
     double interg = 0.;
     Encoder10msDist Encoder;
     Encoder.init();
-    //前进一点免得倒的太后
-    Motor.move(PARK_SPEED,1);
-    while(interg < 0.05){
+    // //前进一点免得倒的太后
+    // Motor.move(PARK_SPEED,1);
+    // while(interg < 0.05){
         
-        interg += Encoder.Get_10ms_dist();
-    }
-    //退
-    interg = 0;
-    Motor.move(PARK_SPEED,0);
+    //     interg += Encoder.Get_10ms_dist();
+    // }
+    // //退
+    // interg = 0;
+    // Motor.move(PARK_SPEED,0);
 
-    roll.setAngle(90);
+    // roll.setAngle(90);
 
-    interg = 0;
+    // interg = 0;
 
-    while(interg < 0.07){
-        interg += Encoder.Get_10ms_dist();
-    }
+    // while(interg < 0.07){
+    //     interg += Encoder.Get_10ms_dist();
+    // }
 
-    roll.setAngle(0);
+    // roll.setAngle(0);
 
-    interg = 0;
+    // interg = 0;
 
-    while(interg < 0.48){
-        interg += Encoder.Get_10ms_dist();
-    }
+    // while(interg < 0.48){
+    //     interg += Encoder.Get_10ms_dist();
+    // }
 
-    roll.setAngle(90);
+    // roll.setAngle(90);
 
-    interg = 0;
+    // interg = 0;
 
-    while(interg < 0.16){
-        interg += Encoder.Get_10ms_dist();
-    }
-    Motor.move(0,0);
+    // while(interg < 0.16){
+    //     interg += Encoder.Get_10ms_dist();
+    // }
+    // Motor.move(0,0);
 
-    //完成入库，现在出库
-    sleep(1);
+    // //完成入库，现在出库
+    // sleep(1);
 
     Motor.move(PARK_SPEED,1);//前进
 
@@ -762,9 +764,6 @@ void parking(){
     switch (parkcount)
     {
     case 0:
-        first_parking();
-        break;
-    case 1:
         second_parking();
         break;
     default:
