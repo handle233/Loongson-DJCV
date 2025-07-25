@@ -38,7 +38,7 @@ def generate_launch_description():
 
     rviz_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('lidar_cartographer'), 'launch', 'rviz_launch.py')
+            os.path.join(get_package_share_directory('lidar_cartographer'), 'launch', 'rviz_launch1.py')
         )
     )
 
