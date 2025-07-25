@@ -271,7 +271,8 @@ private:
         odom_msg.pose.pose.position.z = 0.0;
 
         tf2::Quaternion q1;
-        q1.setRPY(0, 0, angle_degree_[2] * M_PI / 180.0);
+        // q1.setRPY(0, 0, angle_degree_[2] * M_PI / 180.0);
+        q1.setRPY(0, 0, theta_integral);
         odom_msg.pose.pose.orientation = tf2::toMsg(q1);
 
         odom_msg.twist.twist.linear.x = data.encoder_data / dt;  // v = s / t (t = 0.01s)
