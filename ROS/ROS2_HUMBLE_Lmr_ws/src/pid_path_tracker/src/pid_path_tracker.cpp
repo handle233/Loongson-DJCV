@@ -2,7 +2,7 @@
 #include "nav2_util/node_utils.hpp"
 #include "nav2_costmap_2d/costmap_2d.hpp"
 #include "pluginlib/class_list_macros.hpp"
-
+#include "pid_path_tracker/PID.h"
 namespace pid_path_tracker
 {
 
@@ -240,17 +240,25 @@ geometry_msgs::msg::TwistStamped PIDPathTracker::computeVelocityCommands(
 
   // 步骤 3: 计算控制值
   // double lateral_error = target_waypoint.pose.position.y;
-  // rclcpp::Time now = clock_->now();
-  // rclcpp::Duration duration = now - last_time_;
-  // double dt_ = duration.seconds();
-  // if (dt_ < 1e-6) {
-  //    dt_ = 1e-3;
-  // }
-  // last_time_ = now;
+  rclcpp::Time now = clock_->now();
+  rclcpp::Duration duration = now - last_time_;
+  double dt_ = duration.seconds();
+  if (dt_ < 1e-6) {
+     dt_ = 1e-3;
+  }
+  last_time_ = now;
 
   // double angular_velocity = pid_->computeCommand(lateral_error, dt_);
+
+/*------------------------PID-----------------------------*/
   double pid_kp = 0.8;
-  double angular_velocity = std::clamp(pid_kp * angle_error, -max_angular_vel_, max_angular_vel_);
+  double pid_ki = 0.0;
+  double pid_kd = 0.0;
+  PIDController pid(pid_kp,pid_ki,pid_kp,-max_angular_vel_,max_angular_vel_);
+  double angular_velocity = pid.compute(angle_error, dt_);
+/*------------------------PID-----------------------------*/
+  
+  // double angular_velocity = std::clamp(pid_kp * angle_error, -max_angular_vel_, max_angular_vel_);
   printf("angular_velocity =%.2f\n",angular_velocity);
   // 限制角速度
   // angular_velocity = std::clamp(angular_velocity, -max_angular_vel_, max_angular_vel_);

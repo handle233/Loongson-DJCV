@@ -21,9 +21,10 @@ find_package(nav2_costmap_2d REQUIRED)
 # Add include directories
 include_directories(include)
 
+
 # Create the controller plugin library
 add_library(pid_path_tracker_plugin SHARED
-  src/pid_path_tracker.cpp
+  src/pid_path_tracker.cpp 
 )
 ament_target_dependencies(pid_path_tracker_plugin PUBLIC
   "rclcpp"
@@ -37,7 +38,10 @@ ament_target_dependencies(pid_path_tracker_plugin PUBLIC
   "nav2_util"
   "nav2_costmap_2d"
 )
-
+# target_include_directories(pid_path_tracker PUBLIC
+#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#   $<INSTALL_INTERFACE:include>
+# )
 # Export the plugin description file
 pluginlib_export_plugin_description_file(nav2_core plugins.xml)
 
